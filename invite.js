@@ -40,19 +40,21 @@ export class Invitation{
   this.el.classList.remove('out');await wait(240);this.el.classList.add('down');await wait(320);
   this.el.hidden=true;this.el.className='';this.state=keep?'tucked':'closed';$('letter-reopen').hidden=!keep;this.onClose?.(keep);
  }
- async reopen(){$('letter-reopen').hidden=true;this.state='opening';const el=this.el;el.hidden=false;el.className='rise unseal open';void el.offsetWidth;el.classList.add('out');await wait(360);this.state='open';document.body.classList.add('reading');}
+ async reopen(){$('letter-reopen').hidden=true;this.locked=false;this.state='opening';const el=this.el;el.hidden=false;el.className='rise unseal open';void el.offsetWidth;el.classList.add('out');await wait(360);this.state='open';document.body.classList.add('reading');}
  setBusy(b){this.busy=b;$('letter-submit').disabled=b;$('letter-later').disabled=b;$('passcode').readOnly=b;$('letter-submit').textContent=b?'核对中…':'呈上密语';this.el.classList.toggle('busy',b);}
  async submit(){
-  if(this.busy||this.state!=='open')return;                       // no double submit
+  if(this.busy||this.locked||this.state!=='open')return;          // no double submit
   const code=$('passcode').value.trim();
   if(!code){this.state='invalid';this.status('请先写下信上的通行密语。','warn');$('passcode').focus();return;}
   if(code.length>32){this.state='invalid';this.status('密语太长了，请再核对一次。','warn');return;}
   this.setBusy(true);this.status('守门人正在核对……','busy');
   let result;try{result=await this.onSubmit(code);}catch{result={kind:'network'};}
   this.setBusy(false);this.status('');this.state='open';
+  // a refusal or a limit is answered by the story; the letter stays shut until it is reopened
+  this.locked=!!result&&result.kind!=='network';
   return result;
  }
- reset(){this.state='closed';this.busy=false;$('passcode').value='';this.status('');this.setBusy(false);this.el.hidden=true;this.el.className='';$('letter-reopen').hidden=true;document.body.classList.remove('reading');}
+ reset(){this.state='closed';this.busy=false;this.locked=false;$('passcode').value='';this.status('');this.setBusy(false);this.el.hidden=true;this.el.className='';$('letter-reopen').hidden=true;document.body.classList.remove('reading');}
 }
 
 // Ask the server. Timeouts and 5xx are network trouble, 401 is a real refusal.

@@ -4,7 +4,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#11141f;fon
 #game{position:fixed;inset:0;background:#11141f}
 canvas{display:block}
 #map-layer{position:fixed;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
-#game canvas{image-rendering:pixelated;image-rendering:crisp-edges}
+#veil{position:fixed;inset:0;z-index:2;pointer-events:none;background:#1a120e;opacity:0;transition:opacity .3s ease}#veil.on{opacity:1}
 #boot{position:fixed;inset:0;display:grid;align-content:center;justify-items:center;background:radial-gradient(ellipse,#e2cda2,#b79a68);z-index:9;letter-spacing:5px;font-family:Georgia,var(--hand)}
 #boot .ink-mark{font-size:32px;animation:breathe-o 2s ease-in-out infinite}
 @keyframes breathe-o{50%{opacity:.35}}
@@ -37,8 +37,8 @@ body.talking #arrival,body.reading #arrival{opacity:.55;transition:opacity .5s}
 #dialog.shown{opacity:1;transform:none}
 #speaker{position:absolute;left:2%;bottom:calc(100% - 26px);width:var(--sw);aspect-ratio:5/6;overflow:hidden;-webkit-mask-image:linear-gradient(#000 78%,transparent);mask-image:linear-gradient(#000 78%,transparent);pointer-events:none}
 #speaker .inner{position:absolute;left:0;top:0;width:360px;height:432px;transform-origin:0 0}
-#speaker .cam{position:absolute;inset:0;transform-origin:63% 17%;transition:transform .55s cubic-bezier(.3,.8,.3,1)}
-#speaker .cam[data-frame=close]{transform:scale(2.05) translateY(4%)}
+#speaker .cam{position:absolute;inset:0;transform-origin:61% 32%;transition:transform .55s cubic-bezier(.3,.8,.3,1)}
+#speaker .cam[data-frame=close]{transform:scale(1.75) translateY(5%)}
 #speaker .pose{position:absolute;inset:0;opacity:0;transition:opacity .22s}
 #speaker .pose.on{opacity:1;animation:breathe 4.4s ease-in-out infinite}
 @keyframes breathe{50%{transform:translateY(-1.5px) scaleY(1.004)}}
