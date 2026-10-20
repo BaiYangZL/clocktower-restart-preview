@@ -1,0 +1,1599 @@
+{
+ "version": 4,
+ "from": "运行版-v3",
+ "sheet": "guard-v4.webp",
+ "rims": "guard-v4-rim.webp",
+ "size": [
+  980,
+  1078
+ ],
+ "rimOffset": 980,
+ "cell": 96,
+ "artPixel": 2,
+ "height": 80,
+ "colours": 30,
+ "palette": [
+  "#18111c",
+  "#25131d",
+  "#1b151f",
+  "#1f1823",
+  "#341320",
+  "#221c26",
+  "#2b1a1d",
+  "#371e1b",
+  "#441523",
+  "#251f2a",
+  "#29232e",
+  "#2c2734",
+  "#4e2718",
+  "#342c35",
+  "#3e261f",
+  "#581727",
+  "#751c2c",
+  "#623419",
+  "#4c3428",
+  "#992533",
+  "#57453c",
+  "#724d2a",
+  "#7c4018",
+  "#99551c",
+  "#866746",
+  "#b27127",
+  "#b6a8a5",
+  "#d18e33",
+  "#e8b14b",
+  "#ede5e0"
+ ],
+ "frames": {
+  "S/walk/0": {
+   "frame": [
+    1,
+    1,
+    96,
+    96
+   ],
+   "root": [
+    47.915597904302786,
+    90
+   ],
+   "source": "walk/S-8帧候选.png"
+  },
+  "S/walk/1": {
+   "frame": [
+    99,
+    1,
+    96,
+    96
+   ],
+   "root": [
+    47.84003326309334,
+    90
+   ],
+   "source": "walk/S-8帧候选.png"
+  },
+  "S/walk/2": {
+   "frame": [
+    197,
+    1,
+    96,
+    96
+   ],
+   "root": [
+    48.03782380919518,
+    90
+   ],
+   "source": "walk/S-8帧候选.png"
+  },
+  "S/walk/3": {
+   "frame": [
+    295,
+    1,
+    96,
+    96
+   ],
+   "root": [
+    48.06930114120737,
+    90
+   ],
+   "source": "walk/S-8帧候选.png"
+  },
+  "S/walk/4": {
+   "frame": [
+    393,
+    1,
+    96,
+    96
+   ],
+   "root": [
+    48.05876613011869,
+    90
+   ],
+   "source": "walk/S-8帧候选.png"
+  },
+  "S/walk/5": {
+   "frame": [
+    491,
+    1,
+    96,
+    96
+   ],
+   "root": [
+    48.13235990801998,
+    90
+   ],
+   "source": "walk/S-8帧候选.png"
+  },
+  "S/walk/6": {
+   "frame": [
+    589,
+    1,
+    96,
+    96
+   ],
+   "root": [
+    48.069954358422194,
+    90
+   ],
+   "source": "walk/S-8帧候选.png"
+  },
+  "S/walk/7": {
+   "frame": [
+    687,
+    1,
+    96,
+    96
+   ],
+   "root": [
+    47.94044376944532,
+    90
+   ],
+   "source": "walk/S-8帧候选.png"
+  },
+  "SE/walk/0": {
+   "frame": [
+    785,
+    1,
+    96,
+    96
+   ],
+   "root": [
+    48.89061553029959,
+    90
+   ],
+   "source": "walk/SE-8帧候选.png"
+  },
+  "SE/walk/1": {
+   "frame": [
+    883,
+    1,
+    96,
+    96
+   ],
+   "root": [
+    47.79958234602747,
+    90
+   ],
+   "source": "walk/SE-8帧候选.png"
+  },
+  "SE/walk/2": {
+   "frame": [
+    1,
+    99,
+    96,
+    96
+   ],
+   "root": [
+    48.049230154056595,
+    90
+   ],
+   "source": "walk/SE-8帧候选.png"
+  },
+  "SE/walk/3": {
+   "frame": [
+    99,
+    99,
+    96,
+    96
+   ],
+   "root": [
+    47.993294967619775,
+    90
+   ],
+   "source": "walk/SE-8帧候选.png"
+  },
+  "SE/walk/4": {
+   "frame": [
+    197,
+    99,
+    96,
+    96
+   ],
+   "root": [
+    47.94074794521299,
+    90
+   ],
+   "source": "walk/SE-8帧候选.png"
+  },
+  "SE/walk/5": {
+   "frame": [
+    295,
+    99,
+    96,
+    96
+   ],
+   "root": [
+    47.90049872955345,
+    90
+   ],
+   "source": "walk/SE-8帧候选.png"
+  },
+  "SE/walk/6": {
+   "frame": [
+    393,
+    99,
+    96,
+    96
+   ],
+   "root": [
+    48.14994937635245,
+    90
+   ],
+   "source": "walk/SE-8帧候选.png"
+  },
+  "SE/walk/7": {
+   "frame": [
+    491,
+    99,
+    96,
+    96
+   ],
+   "root": [
+    47.78410541347073,
+    90
+   ],
+   "source": "walk/SE-8帧候选.png"
+  },
+  "SW/walk/0": {
+   "frame": [
+    589,
+    99,
+    96,
+    96
+   ],
+   "root": [
+    47.95005019021936,
+    90
+   ],
+   "source": "walk/SW-8帧候选.png"
+  },
+  "SW/walk/1": {
+   "frame": [
+    687,
+    99,
+    96,
+    96
+   ],
+   "root": [
+    47.89369504145837,
+    90
+   ],
+   "source": "walk/SW-8帧候选.png"
+  },
+  "SW/walk/2": {
+   "frame": [
+    785,
+    99,
+    96,
+    96
+   ],
+   "root": [
+    48.08946373892158,
+    90
+   ],
+   "source": "walk/SW-8帧候选.png"
+  },
+  "SW/walk/3": {
+   "frame": [
+    883,
+    99,
+    96,
+    96
+   ],
+   "root": [
+    48.215426144862846,
+    90
+   ],
+   "source": "walk/SW-8帧候选.png"
+  },
+  "SW/walk/4": {
+   "frame": [
+    1,
+    197,
+    96,
+    96
+   ],
+   "root": [
+    47.91498026216127,
+    90
+   ],
+   "source": "walk/SW-8帧候选.png"
+  },
+  "SW/walk/5": {
+   "frame": [
+    99,
+    197,
+    96,
+    96
+   ],
+   "root": [
+    48.03910727162837,
+    90
+   ],
+   "source": "walk/SW-8帧候选.png"
+  },
+  "SW/walk/6": {
+   "frame": [
+    197,
+    197,
+    96,
+    96
+   ],
+   "root": [
+    48.16839708737655,
+    90
+   ],
+   "source": "walk/SW-8帧候选.png"
+  },
+  "SW/walk/7": {
+   "frame": [
+    295,
+    197,
+    96,
+    96
+   ],
+   "root": [
+    47.95982158244526,
+    90
+   ],
+   "source": "walk/SW-8帧候选.png"
+  },
+  "NE/walk/0": {
+   "frame": [
+    393,
+    197,
+    96,
+    96
+   ],
+   "root": [
+    48.11531851264501,
+    90
+   ],
+   "source": "walk/NE-8帧候选.png"
+  },
+  "NE/walk/1": {
+   "frame": [
+    491,
+    197,
+    96,
+    96
+   ],
+   "root": [
+    48.220865547233835,
+    90
+   ],
+   "source": "walk/NE-8帧候选.png"
+  },
+  "NE/walk/2": {
+   "frame": [
+    589,
+    197,
+    96,
+    96
+   ],
+   "root": [
+    48.20737969460573,
+    90
+   ],
+   "source": "walk/NE-8帧候选.png"
+  },
+  "NE/walk/3": {
+   "frame": [
+    687,
+    197,
+    96,
+    96
+   ],
+   "root": [
+    48.17650920962788,
+    90
+   ],
+   "source": "walk/NE-8帧候选.png"
+  },
+  "NE/walk/4": {
+   "frame": [
+    785,
+    197,
+    96,
+    96
+   ],
+   "root": [
+    48.14139776275524,
+    90
+   ],
+   "source": "walk/NE-8帧候选.png"
+  },
+  "NE/walk/5": {
+   "frame": [
+    883,
+    197,
+    96,
+    96
+   ],
+   "root": [
+    47.838664576145774,
+    90
+   ],
+   "source": "walk/NE-8帧候选.png"
+  },
+  "NE/walk/6": {
+   "frame": [
+    1,
+    295,
+    96,
+    96
+   ],
+   "root": [
+    48.04778378394602,
+    90
+   ],
+   "source": "walk/NE-8帧候选.png"
+  },
+  "NE/walk/7": {
+   "frame": [
+    99,
+    295,
+    96,
+    96
+   ],
+   "root": [
+    47.969794578985365,
+    90
+   ],
+   "source": "walk/NE-8帧候选.png"
+  },
+  "NW/walk/0": {
+   "frame": [
+    197,
+    295,
+    96,
+    96
+   ],
+   "root": [
+    48.08019465352322,
+    90
+   ],
+   "source": "walk/NW-8帧候选.png"
+  },
+  "NW/walk/1": {
+   "frame": [
+    295,
+    295,
+    96,
+    96
+   ],
+   "root": [
+    47.80968456986944,
+    90
+   ],
+   "source": "walk/NW-8帧候选.png"
+  },
+  "NW/walk/2": {
+   "frame": [
+    393,
+    295,
+    96,
+    96
+   ],
+   "root": [
+    48.24793018354689,
+    90
+   ],
+   "source": "walk/NW-8帧候选.png"
+  },
+  "NW/walk/3": {
+   "frame": [
+    491,
+    295,
+    96,
+    96
+   ],
+   "root": [
+    48.22639923266641,
+    90
+   ],
+   "source": "walk/NW-8帧候选.png"
+  },
+  "NW/walk/4": {
+   "frame": [
+    589,
+    295,
+    96,
+    96
+   ],
+   "root": [
+    47.827525086998534,
+    90
+   ],
+   "source": "walk/NW-8帧候选.png"
+  },
+  "NW/walk/5": {
+   "frame": [
+    687,
+    295,
+    96,
+    96
+   ],
+   "root": [
+    48.13575102717661,
+    90
+   ],
+   "source": "walk/NW-8帧候选.png"
+  },
+  "NW/walk/6": {
+   "frame": [
+    785,
+    295,
+    96,
+    96
+   ],
+   "root": [
+    48.160321200152424,
+    90
+   ],
+   "source": "walk/NW-8帧候选.png"
+  },
+  "NW/walk/7": {
+   "frame": [
+    883,
+    295,
+    96,
+    96
+   ],
+   "root": [
+    47.94629580451035,
+    90
+   ],
+   "source": "walk/NW-8帧候选.png"
+  },
+  "N/walk/0": {
+   "frame": [
+    1,
+    393,
+    96,
+    96
+   ],
+   "root": [
+    47.91984255410782,
+    90
+   ],
+   "source": "walk/N-8帧候选.png"
+  },
+  "N/walk/1": {
+   "frame": [
+    99,
+    393,
+    96,
+    96
+   ],
+   "root": [
+    47.790943858924976,
+    90
+   ],
+   "source": "walk/N-8帧候选.png"
+  },
+  "N/walk/2": {
+   "frame": [
+    197,
+    393,
+    96,
+    96
+   ],
+   "root": [
+    48.20889645442496,
+    90
+   ],
+   "source": "walk/N-8帧候选.png"
+  },
+  "N/walk/3": {
+   "frame": [
+    295,
+    393,
+    96,
+    96
+   ],
+   "root": [
+    48.19255663366404,
+    90
+   ],
+   "source": "walk/N-8帧候选.png"
+  },
+  "N/walk/4": {
+   "frame": [
+    393,
+    393,
+    96,
+    96
+   ],
+   "root": [
+    48.03065033923481,
+    90
+   ],
+   "source": "walk/N-8帧候选.png"
+  },
+  "N/walk/5": {
+   "frame": [
+    491,
+    393,
+    96,
+    96
+   ],
+   "root": [
+    48.06425002395763,
+    90
+   ],
+   "source": "walk/N-8帧候选.png"
+  },
+  "N/walk/6": {
+   "frame": [
+    589,
+    393,
+    96,
+    96
+   ],
+   "root": [
+    47.838206210402234,
+    90
+   ],
+   "source": "walk/N-8帧候选.png"
+  },
+  "N/walk/7": {
+   "frame": [
+    687,
+    393,
+    96,
+    96
+   ],
+   "root": [
+    48.04738231920572,
+    90
+   ],
+   "source": "walk/N-8帧候选.png"
+  },
+  "E/walk/0": {
+   "frame": [
+    785,
+    393,
+    96,
+    96
+   ],
+   "root": [
+    48.645646678127214,
+    90
+   ],
+   "source": "walk/E-右侧-8帧候选.png"
+  },
+  "E/walk/1": {
+   "frame": [
+    883,
+    393,
+    96,
+    96
+   ],
+   "root": [
+    48.19206493626844,
+    90
+   ],
+   "source": "walk/E-右侧-8帧候选.png"
+  },
+  "E/walk/2": {
+   "frame": [
+    1,
+    491,
+    96,
+    96
+   ],
+   "root": [
+    48.1941648504889,
+    90
+   ],
+   "source": "walk/E-右侧-8帧候选.png"
+  },
+  "E/walk/3": {
+   "frame": [
+    99,
+    491,
+    96,
+    96
+   ],
+   "root": [
+    47.907520923520934,
+    90
+   ],
+   "source": "walk/E-右侧-8帧候选.png"
+  },
+  "E/walk/4": {
+   "frame": [
+    197,
+    491,
+    96,
+    96
+   ],
+   "root": [
+    47.904017992924494,
+    90
+   ],
+   "source": "walk/E-右侧-8帧候选.png"
+  },
+  "E/walk/5": {
+   "frame": [
+    295,
+    491,
+    96,
+    96
+   ],
+   "root": [
+    48.10200986533364,
+    90
+   ],
+   "source": "walk/E-右侧-8帧候选.png"
+  },
+  "E/walk/6": {
+   "frame": [
+    393,
+    491,
+    96,
+    96
+   ],
+   "root": [
+    48.17098454986183,
+    90
+   ],
+   "source": "walk/E-右侧-8帧候选.png"
+  },
+  "E/walk/7": {
+   "frame": [
+    491,
+    491,
+    96,
+    96
+   ],
+   "root": [
+    47.958454929883494,
+    90
+   ],
+   "source": "walk/E-右侧-8帧候选.png"
+  },
+  "W/walk/0": {
+   "frame": [
+    589,
+    491,
+    96,
+    96
+   ],
+   "root": [
+    47.77184088722487,
+    90
+   ],
+   "source": "walk/W-8帧候选.png"
+  },
+  "W/walk/1": {
+   "frame": [
+    687,
+    491,
+    96,
+    96
+   ],
+   "root": [
+    48.061418213614736,
+    90
+   ],
+   "source": "walk/W-8帧候选.png"
+  },
+  "W/walk/2": {
+   "frame": [
+    785,
+    491,
+    96,
+    96
+   ],
+   "root": [
+    47.90529111003405,
+    90
+   ],
+   "source": "walk/W-8帧候选.png"
+  },
+  "W/walk/3": {
+   "frame": [
+    883,
+    491,
+    96,
+    96
+   ],
+   "root": [
+    47.784730430101504,
+    90
+   ],
+   "source": "walk/W-8帧候选.png"
+  },
+  "W/walk/4": {
+   "frame": [
+    1,
+    589,
+    96,
+    96
+   ],
+   "root": [
+    48.15219294188422,
+    90
+   ],
+   "source": "walk/W-8帧候选.png"
+  },
+  "W/walk/5": {
+   "frame": [
+    99,
+    589,
+    96,
+    96
+   ],
+   "root": [
+    48.188726225133884,
+    90
+   ],
+   "source": "walk/W-8帧候选.png"
+  },
+  "W/walk/6": {
+   "frame": [
+    197,
+    589,
+    96,
+    96
+   ],
+   "root": [
+    48.1386392830869,
+    90
+   ],
+   "source": "walk/W-8帧候选.png"
+  },
+  "W/walk/7": {
+   "frame": [
+    295,
+    589,
+    96,
+    96
+   ],
+   "root": [
+    47.75648249615934,
+    90
+   ],
+   "source": "walk/W-8帧候选.png"
+  },
+  "S/gestures/0": {
+   "frame": [
+    393,
+    589,
+    96,
+    96
+   ],
+   "root": [
+    48.09034669660614,
+    90
+   ],
+   "source": "gestures/S-阻止欢迎点头迟疑-16格候选.png"
+  },
+  "S/gestures/1": {
+   "frame": [
+    491,
+    589,
+    96,
+    96
+   ],
+   "root": [
+    48.1032476332174,
+    90
+   ],
+   "source": "gestures/S-阻止欢迎点头迟疑-16格候选.png"
+  },
+  "S/gestures/2": {
+   "frame": [
+    589,
+    589,
+    96,
+    96
+   ],
+   "root": [
+    48.12158486775396,
+    90
+   ],
+   "source": "gestures/S-阻止欢迎点头迟疑-16格候选.png"
+  },
+  "S/gestures/3": {
+   "frame": [
+    687,
+    589,
+    96,
+    96
+   ],
+   "root": [
+    47.93246315572596,
+    90
+   ],
+   "source": "gestures/S-阻止欢迎点头迟疑-16格候选.png"
+  },
+  "S/gestures/4": {
+   "frame": [
+    785,
+    589,
+    96,
+    96
+   ],
+   "root": [
+    48.01285043444029,
+    90
+   ],
+   "source": "gestures/S-阻止欢迎点头迟疑-16格候选.png"
+  },
+  "S/gestures/5": {
+   "frame": [
+    883,
+    589,
+    96,
+    96
+   ],
+   "root": [
+    47.88402896893463,
+    90
+   ],
+   "source": "gestures/S-阻止欢迎点头迟疑-16格候选.png"
+  },
+  "S/gestures/6": {
+   "frame": [
+    1,
+    687,
+    96,
+    96
+   ],
+   "root": [
+    48.18935775985805,
+    90
+   ],
+   "source": "gestures/S-阻止欢迎点头迟疑-16格候选.png"
+  },
+  "S/gestures/7": {
+   "frame": [
+    99,
+    687,
+    96,
+    96
+   ],
+   "root": [
+    48.18306422193227,
+    90
+   ],
+   "source": "gestures/S-阻止欢迎点头迟疑-16格候选.png"
+  },
+  "S/gestures/8": {
+   "frame": [
+    197,
+    687,
+    96,
+    96
+   ],
+   "root": [
+    48.06423205773151,
+    90
+   ],
+   "source": "gestures/S-阻止欢迎点头迟疑-16格候选.png"
+  },
+  "S/gestures/9": {
+   "frame": [
+    295,
+    687,
+    96,
+    96
+   ],
+   "root": [
+    48.2014870840538,
+    90
+   ],
+   "source": "gestures/S-阻止欢迎点头迟疑-16格候选.png"
+  },
+  "S/gestures/10": {
+   "frame": [
+    393,
+    687,
+    96,
+    96
+   ],
+   "root": [
+    48.04174377227338,
+    90
+   ],
+   "source": "gestures/S-阻止欢迎点头迟疑-16格候选.png"
+  },
+  "S/gestures/11": {
+   "frame": [
+    491,
+    687,
+    96,
+    96
+   ],
+   "root": [
+    47.8873381409755,
+    90
+   ],
+   "source": "gestures/S-阻止欢迎点头迟疑-16格候选.png"
+  },
+  "S/gestures/12": {
+   "frame": [
+    589,
+    687,
+    96,
+    96
+   ],
+   "root": [
+    48.06405122804139,
+    90
+   ],
+   "source": "gestures/S-阻止欢迎点头迟疑-16格候选.png"
+  },
+  "S/gestures/13": {
+   "frame": [
+    687,
+    687,
+    96,
+    96
+   ],
+   "root": [
+    47.84236631691576,
+    90
+   ],
+   "source": "gestures/S-阻止欢迎点头迟疑-16格候选.png"
+  },
+  "S/gestures/14": {
+   "frame": [
+    785,
+    687,
+    96,
+    96
+   ],
+   "root": [
+    48.22218252986425,
+    90
+   ],
+   "source": "gestures/S-阻止欢迎点头迟疑-16格候选.png"
+  },
+  "S/gestures/15": {
+   "frame": [
+    883,
+    687,
+    96,
+    96
+   ],
+   "root": [
+    48.24873983596182,
+    90
+   ],
+   "source": "gestures/S-阻止欢迎点头迟疑-16格候选.png"
+  },
+  "S/interactions/0": {
+   "frame": [
+    1,
+    785,
+    96,
+    96
+   ],
+   "root": [
+    48.09536653968414,
+    90
+   ],
+   "source": "interactions/S-待机持信递出让路推门转身-32格候选.png"
+  },
+  "S/interactions/1": {
+   "frame": [
+    99,
+    785,
+    96,
+    96
+   ],
+   "root": [
+    48.232935577810935,
+    90
+   ],
+   "source": "interactions/S-待机持信递出让路推门转身-32格候选.png"
+  },
+  "S/interactions/2": {
+   "frame": [
+    197,
+    785,
+    96,
+    96
+   ],
+   "root": [
+    47.96778756125744,
+    90
+   ],
+   "source": "interactions/S-待机持信递出让路推门转身-32格候选.png"
+  },
+  "S/interactions/3": {
+   "frame": [
+    295,
+    785,
+    96,
+    96
+   ],
+   "root": [
+    47.92959690552078,
+    90
+   ],
+   "source": "interactions/S-待机持信递出让路推门转身-32格候选.png"
+  },
+  "S/interactions/4": {
+   "frame": [
+    393,
+    785,
+    96,
+    96
+   ],
+   "root": [
+    48.10817659646357,
+    90
+   ],
+   "source": "interactions/S-待机持信递出让路推门转身-32格候选.png"
+  },
+  "S/interactions/5": {
+   "frame": [
+    491,
+    785,
+    96,
+    96
+   ],
+   "root": [
+    48.17222543538333,
+    90
+   ],
+   "source": "interactions/S-待机持信递出让路推门转身-32格候选.png"
+  },
+  "S/interactions/6": {
+   "frame": [
+    589,
+    785,
+    96,
+    96
+   ],
+   "root": [
+    48.06459186653091,
+    90
+   ],
+   "source": "interactions/S-待机持信递出让路推门转身-32格候选.png"
+  },
+  "S/interactions/7": {
+   "frame": [
+    687,
+    785,
+    96,
+    96
+   ],
+   "root": [
+    48.08810163148606,
+    90
+   ],
+   "source": "interactions/S-待机持信递出让路推门转身-32格候选.png"
+  },
+  "S/interactions/8": {
+   "frame": [
+    785,
+    785,
+    96,
+    96
+   ],
+   "root": [
+    47.92920435495459,
+    90
+   ],
+   "source": "interactions/S-待机持信递出让路推门转身-32格候选.png"
+  },
+  "S/interactions/9": {
+   "frame": [
+    883,
+    785,
+    96,
+    96
+   ],
+   "root": [
+    48.02625141271226,
+    90
+   ],
+   "source": "interactions/S-待机持信递出让路推门转身-32格候选.png"
+  },
+  "S/interactions/10": {
+   "frame": [
+    1,
+    883,
+    96,
+    96
+   ],
+   "root": [
+    48.199358605960285,
+    90
+   ],
+   "source": "interactions/S-待机持信递出让路推门转身-32格候选.png"
+  },
+  "S/interactions/11": {
+   "frame": [
+    99,
+    883,
+    96,
+    96
+   ],
+   "root": [
+    47.961744547044,
+    90
+   ],
+   "source": "interactions/S-待机持信递出让路推门转身-32格候选.png"
+  },
+  "S/interactions/12": {
+   "frame": [
+    197,
+    883,
+    96,
+    96
+   ],
+   "root": [
+    47.76969671687212,
+    90
+   ],
+   "source": "interactions/S-待机持信递出让路推门转身-32格候选.png"
+  },
+  "S/interactions/13": {
+   "frame": [
+    295,
+    883,
+    96,
+    96
+   ],
+   "root": [
+    48.00862833780249,
+    90
+   ],
+   "source": "interactions/S-待机持信递出让路推门转身-32格候选.png"
+  },
+  "S/interactions/14": {
+   "frame": [
+    393,
+    883,
+    96,
+    96
+   ],
+   "root": [
+    48.04159042048964,
+    90
+   ],
+   "source": "interactions/S-待机持信递出让路推门转身-32格候选.png"
+  },
+  "S/interactions/15": {
+   "frame": [
+    491,
+    883,
+    96,
+    96
+   ],
+   "root": [
+    48.122620810277134,
+    90
+   ],
+   "source": "interactions/S-待机持信递出让路推门转身-32格候选.png"
+  },
+  "S/interactions/28": {
+   "frame": [
+    589,
+    883,
+    96,
+    96
+   ],
+   "root": [
+    48.00331910395721,
+    90
+   ],
+   "source": "interactions/S-待机持信递出让路推门转身-32格候选.png"
+  },
+  "S/interactions/29": {
+   "frame": [
+    687,
+    883,
+    96,
+    96
+   ],
+   "root": [
+    48.128016978679554,
+    90
+   ],
+   "source": "interactions/S-待机持信递出让路推门转身-32格候选.png"
+  },
+  "S/interactions/30": {
+   "frame": [
+    785,
+    883,
+    96,
+    96
+   ],
+   "root": [
+    48.19738470665778,
+    90
+   ],
+   "source": "interactions/S-待机持信递出让路推门转身-32格候选.png"
+  },
+  "S/interactions/31": {
+   "frame": [
+    883,
+    883,
+    96,
+    96
+   ],
+   "root": [
+    47.988920832217666,
+    90
+   ],
+   "source": "interactions/S-待机持信递出让路推门转身-32格候选.png"
+  },
+  "N/interactions/0": {
+   "frame": [
+    1,
+    981,
+    96,
+    96
+   ],
+   "root": [
+    48.040733894708026,
+    90
+   ],
+   "source": "interactions/N-待机持信递出让路推门转身-32格候选.png"
+  },
+  "N/interactions/1": {
+   "frame": [
+    99,
+    981,
+    96,
+    96
+   ],
+   "root": [
+    48.02898550724637,
+    90
+   ],
+   "source": "interactions/N-待机持信递出让路推门转身-32格候选.png"
+  },
+  "N/interactions/2": {
+   "frame": [
+    197,
+    981,
+    96,
+    96
+   ],
+   "root": [
+    48.16632749966084,
+    90
+   ],
+   "source": "interactions/N-待机持信递出让路推门转身-32格候选.png"
+  },
+  "N/interactions/3": {
+   "frame": [
+    295,
+    981,
+    96,
+    96
+   ],
+   "root": [
+    48.04064454064457,
+    90
+   ],
+   "source": "interactions/N-待机持信递出让路推门转身-32格候选.png"
+  },
+  "N/interactions/20": {
+   "frame": [
+    393,
+    981,
+    96,
+    96
+   ],
+   "root": [
+    47.915465898174816,
+    90
+   ],
+   "source": "interactions/N-待机持信递出让路推门转身-32格候选.png"
+  },
+  "N/interactions/21": {
+   "frame": [
+    491,
+    981,
+    96,
+    96
+   ],
+   "root": [
+    48.248247663551396,
+    90
+   ],
+   "source": "interactions/N-待机持信递出让路推门转身-32格候选.png"
+  },
+  "N/interactions/22": {
+   "frame": [
+    589,
+    981,
+    96,
+    96
+   ],
+   "root": [
+    48.148933222499295,
+    90
+   ],
+   "source": "interactions/N-待机持信递出让路推门转身-32格候选.png"
+  },
+  "N/interactions/23": {
+   "frame": [
+    687,
+    981,
+    96,
+    96
+   ],
+   "root": [
+    47.84329784329785,
+    90
+   ],
+   "source": "interactions/N-待机持信递出让路推门转身-32格候选.png"
+  }
+ },
+ "clips": {
+  "walk-S": [
+   "S/walk/0",
+   "S/walk/1",
+   "S/walk/2",
+   "S/walk/3",
+   "S/walk/4",
+   "S/walk/5",
+   "S/walk/6",
+   "S/walk/7"
+  ],
+  "walk-SE": [
+   "SE/walk/0",
+   "SE/walk/1",
+   "SE/walk/2",
+   "SE/walk/3",
+   "SE/walk/4",
+   "SE/walk/5",
+   "SE/walk/6",
+   "SE/walk/7"
+  ],
+  "walk-SW": [
+   "SW/walk/0",
+   "SW/walk/1",
+   "SW/walk/2",
+   "SW/walk/3",
+   "SW/walk/4",
+   "SW/walk/5",
+   "SW/walk/6",
+   "SW/walk/7"
+  ],
+  "walk-NE": [
+   "NE/walk/0",
+   "NE/walk/1",
+   "NE/walk/2",
+   "NE/walk/3",
+   "NE/walk/4",
+   "NE/walk/5",
+   "NE/walk/6",
+   "NE/walk/7"
+  ],
+  "walk-NW": [
+   "NW/walk/0",
+   "NW/walk/1",
+   "NW/walk/2",
+   "NW/walk/3",
+   "NW/walk/4",
+   "NW/walk/5",
+   "NW/walk/6",
+   "NW/walk/7"
+  ],
+  "walk-N": [
+   "N/walk/0",
+   "N/walk/1",
+   "N/walk/2",
+   "N/walk/3",
+   "N/walk/4",
+   "N/walk/5",
+   "N/walk/6",
+   "N/walk/7"
+  ],
+  "walk-E": [
+   "E/walk/0",
+   "E/walk/1",
+   "E/walk/2",
+   "E/walk/3",
+   "E/walk/4",
+   "E/walk/5",
+   "E/walk/6",
+   "E/walk/7"
+  ],
+  "walk-W": [
+   "W/walk/0",
+   "W/walk/1",
+   "W/walk/2",
+   "W/walk/3",
+   "W/walk/4",
+   "W/walk/5",
+   "W/walk/6",
+   "W/walk/7"
+  ],
+  "refuse": [
+   "S/gestures/0",
+   "S/gestures/1",
+   "S/gestures/2",
+   "S/gestures/3"
+  ],
+  "welcome": [
+   "S/gestures/4",
+   "S/gestures/5",
+   "S/gestures/6",
+   "S/gestures/7"
+  ],
+  "nod": [
+   "S/gestures/8",
+   "S/gestures/9",
+   "S/gestures/10",
+   "S/gestures/11"
+  ],
+  "hesitate": [
+   "S/gestures/12",
+   "S/gestures/13",
+   "S/gestures/14",
+   "S/gestures/15"
+  ],
+  "idle-S": [
+   "S/interactions/0",
+   "S/interactions/1",
+   "S/interactions/2",
+   "S/interactions/3"
+  ],
+  "hold-S": [
+   "S/interactions/4",
+   "S/interactions/5",
+   "S/interactions/6",
+   "S/interactions/7"
+  ],
+  "offer-S": [
+   "S/interactions/8",
+   "S/interactions/9",
+   "S/interactions/10",
+   "S/interactions/11",
+   "S/interactions/12",
+   "S/interactions/13",
+   "S/interactions/14",
+   "S/interactions/15"
+  ],
+  "turn-S": [
+   "S/interactions/28",
+   "S/interactions/29",
+   "S/interactions/30",
+   "S/interactions/31"
+  ],
+  "idle-N": [
+   "N/interactions/0",
+   "N/interactions/1",
+   "N/interactions/2",
+   "N/interactions/3"
+  ],
+  "push-N": [
+   "N/interactions/20",
+   "N/interactions/21",
+   "N/interactions/22",
+   "N/interactions/23"
+  ]
+ }
+}

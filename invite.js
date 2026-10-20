@@ -18,10 +18,10 @@ export function paintPaper(){
 
 export class Invitation{
  constructor({onSubmit,onResult,onClose}){
-  this.state='closed';this.busy=false;this.onSubmit=onSubmit;this.onResult=onResult;this.onClose=onClose;this.el=$('letter');
+  this.state='closed';this.busy=false;this.locked=false;this.epoch=0;this.onSubmit=onSubmit;this.onResult=onResult;this.onClose=onClose;this.el=$('letter');
   $('letter-form').addEventListener('submit',e=>{e.preventDefault();this.submit().then(r=>{if(r)this.onResult?.(r);});});
   $('letter-later').onclick=()=>this.close(true);
-  $('passcode').addEventListener('input',()=>{if(this.state==='invalid')this.status('');});
+  $('passcode').addEventListener('input',()=>{if(this.state==='invalid'){this.state='open';this.status('');}});
   // keep the card above the on-screen keyboard
   const vv=window.visualViewport;if(vv){const fit=()=>{const lift=Math.max(0,innerHeight-vv.height-vv.offsetTop);document.documentElement.style.setProperty('--kb',lift+'px');};vv.addEventListener('resize',fit);vv.addEventListener('scroll',fit);}
  }
@@ -43,18 +43,19 @@ export class Invitation{
  async reopen(){$('letter-reopen').hidden=true;this.locked=false;this.state='opening';const el=this.el;el.hidden=false;el.className='rise unseal open';void el.offsetWidth;el.classList.add('out');await wait(360);this.state='open';document.body.classList.add('reading');}
  setBusy(b){this.busy=b;$('letter-submit').disabled=b;$('letter-later').disabled=b;$('passcode').readOnly=b;$('letter-submit').textContent=b?'核对中…':'呈上密语';this.el.classList.toggle('busy',b);}
  async submit(){
-  if(this.busy||this.locked||this.state!=='open')return;          // no double submit
+  if(this.busy||this.locked||!['open','invalid'].includes(this.state))return; // no double submit
   const code=$('passcode').value.trim();
   if(!code){this.state='invalid';this.status('请先写下信上的通行密语。','warn');$('passcode').focus();return;}
   if(code.length>32){this.state='invalid';this.status('密语太长了，请再核对一次。','warn');return;}
-  this.setBusy(true);this.status('守门人正在核对……','busy');
+  const epoch=this.epoch;this.setBusy(true);this.status('守门人正在核对……','busy');
   let result;try{result=await this.onSubmit(code);}catch{result={kind:'network'};}
-  this.setBusy(false);this.status('');this.state='open';
-  // a refusal or a limit is answered by the story; the letter stays shut until it is reopened
-  this.locked=!!result&&result.kind!=='network';
+  if(epoch!==this.epoch)return; // an old request must not affect a replay
+  this.setBusy(false);this.status('');this.state='answered';
+  // Every reply belongs to the story until the letter is explicitly reopened.
+  this.locked=true;
   return result;
  }
- reset(){this.state='closed';this.busy=false;this.locked=false;$('passcode').value='';this.status('');this.setBusy(false);this.el.hidden=true;this.el.className='';$('letter-reopen').hidden=true;document.body.classList.remove('reading');}
+ reset(){this.epoch++;this.state='closed';this.busy=false;this.locked=false;$('passcode').value='';this.status('');this.setBusy(false);this.el.hidden=true;this.el.className='';$('letter-reopen').hidden=true;document.body.classList.remove('reading');}
 }
 
 // Ask the server. Timeouts and 5xx are network trouble, 401 is a real refusal.

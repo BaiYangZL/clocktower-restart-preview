@@ -87,13 +87,22 @@ let texId=0;
 function addTex(scene,c){const key='flora-'+(texId++);scene.textures.addCanvas(key,c).setFilter(Phaser.Textures.FilterMode.LINEAR);return key;}
 
 // A tree standing at (x,y) in scene px. clumps: [dx,dy,r,tone,flat] relative to the base.
-export function makeTree(scene,{x,y,depth,trunk,clumps,seed=1,light,stiff=1}){
+// With a shared cache (many roadside trees), a few painted clumps and trunks are reused,
+// scaled to size: painting each one afresh would cost seconds and much texture memory.
+const R0=64,H0=320;
+export function makeTree(scene,{x,y,depth,trunk,clumps,seed=1,light,stiff=1,cache=null}){
  const parts=[],objs=[];
- if(trunk){const t=paintTrunk(trunk.h,{seed,lean:trunk.lean||0,limbs:trunk.limbs||[]});
-  const im=scene.add.image(x,y,addTex(scene,t.canvas)).setOrigin(t.ox/(t.canvas.width/RES),t.oy/(t.canvas.height/RES)).setScale(1/RES).setDepth(depth);objs.push(im);}
+ if(trunk){
+  let key,k=1,t;
+  if(cache){const id='t|'+(seed%4);if(!cache.has(id)){t=paintTrunk(H0,{seed:11+(seed%4)*7,lean:((seed%4)-1.5)*.06,limbs:[[.62,-60,-50,11],[.72,70,-56,10],[.5,-90,-24,8]]});cache.set(id,{key:addTex(scene,t.canvas),t});}
+   ({key,t}=cache.get(id));k=trunk.h/H0;}
+  else{t=paintTrunk(trunk.h,{seed,lean:trunk.lean||0,limbs:trunk.limbs||[]});key=addTex(scene,t.canvas);}
+  const im=scene.add.image(x,y,key).setOrigin(t.ox/(t.canvas.width/RES),t.oy/(t.canvas.height/RES)).setScale(k/RES).setDepth(depth);objs.push(im);}
  clumps.forEach(([dx,dy,r,tone,flat],i)=>{
-  const p=paintClump(r,{tone,light,seed:seed*17+i,flat:flat||1}),key=addTex(scene,p.canvas);
-  const im=scene.add.image(x+dx,y+dy,key).setScale(1/RES).setDepth(depth+.01+i*.001);objs.push(im);
+  let key,k=1;
+  if(cache){const id=tone+'|'+(flat||1)+'|'+((seed*17+i)%4);if(!cache.has(id))cache.set(id,addTex(scene,paintClump(R0,{tone,light,seed:97+((seed*17+i)%4)*31+tone.length,flat:flat||1}).canvas));key=cache.get(id);k=r/R0;}
+  else key=addTex(scene,paintClump(r,{tone,light,seed:seed*17+i,flat:flat||1}).canvas);
+  const im=scene.add.image(x+dx,y+dy,key).setScale(k/RES).setDepth(depth+(cache?2e-6*(1+i):.01+i*.001));objs.push(im);
   // it sways about a point above-and-toward the trunk, more the higher and further out it is
   parts.push({im,x:x+dx,y:y+dy,r,amp:(.008+.006*Math.min(1,-dy/160))/stiff,ph:seed*1.7+i*.9,hx:-dx*.25,hy:r*.6});
  });
@@ -111,14 +120,14 @@ export function makeBush(scene,opts){return makeTree(scene,{...opts,trunk:null,s
 
 // Falling leaves: shed from the clumps of the given trees, carried by the wind, fluttering,
 // landing on the ground line under their tree and fading there.
-export function makeLeaves(scene,{trees,depth,rate=.5,low=false,rain=false}){
+export function makeLeaves(scene,{trees,depth,rate=.5,low=false,rain=false,tint=0xffffff}){
  const keys=['#8fb257','#6f9a46','#b5c766','#a07f3a'].map((col,i)=>{const k='leaf-'+i;if(!scene.textures.exists(k)){const c=canvas(10*RES,6*RES),g=c.getContext('2d');
   g.translate(5*RES,3*RES);g.fillStyle=INK;g.beginPath();g.ellipse(0,0,4.6*RES,2.4*RES,0,0,7);g.fill();g.fillStyle=col;g.beginPath();g.ellipse(0,0,3.8*RES,1.7*RES,0,0,7);g.fill();
   g.strokeStyle='#2c3f22';g.lineWidth=.5*RES;g.beginPath();g.moveTo(-3.6*RES,0);g.lineTo(3.6*RES,0);g.stroke();scene.textures.addCanvas(k,c);}return k;});
- const pool=[],n=low?8:20;
- for(let i=0;i<n;i++){const im=scene.add.image(0,0,keys[i%keys.length]).setScale(1/RES).setDepth(depth).setVisible(false);pool.push({im,on:false});}
+ const pool=[],n=low?14:34;
+ for(let i=0;i<n;i++){const im=scene.add.image(0,0,keys[i%keys.length]).setScale(1/RES).setDepth(depth).setTint(tint).setVisible(false);pool.push({im,on:false});}
  const rnd=random(4242);let acc=0;
- const spawn=()=>{const f=pool.find(p=>!p.on);if(!f)return;const tr=trees[(rnd()*trees.length)|0],c=tr.parts[(rnd()*tr.parts.length)|0];
+ const spawn=()=>{const f=pool.find(p=>!p.on);if(!f)return;const live=trees.filter(t=>t.inView!==false&&t.parts.length);if(!live.length)return;const tr=live[(rnd()*live.length)|0],c=tr.parts[(rnd()*tr.parts.length)|0];
   const a=rnd()*7;Object.assign(f,{on:true,x:c.im.x+Math.cos(a)*c.r*.7,y:c.im.y+Math.sin(a)*c.r*.5,floor:tr.floor??(c.im.y+c.r+90+rnd()*60),vy:rain?34:14+rnd()*10,ph:rnd()*7,spin:(rnd()-.5)*5,rest:0,a:1});
   f.im.setVisible(true).setAlpha(1);};
  return {
