@@ -12,17 +12,24 @@ const $=id=>document.getElementById(id);
 const query=new URLSearchParams(location.search);
 // Review aids only: ?at=秒 jumps the journey to that moment and holds it; ?seed= fixes the
 // map; ?weather=clear|rain forces the night's weather; ?slow=毫秒 delays downloads;
-// ?fail=1 fails the first download; ?q=low|high picks the tier.
+// ?fail=1 fails the first download; ?q=low|high|ultra picks the tier.
 const review={at:query.has('at')?Number(query.get('at')):null,slow:Number(query.get('slow'))||0,fail:query.get('fail')==='1'};
 const forced=['clear','rain'].includes(query.get('weather'))?query.get('weather'):null;
 // The night is decided once per entry: 90% rain, 10% clear (白羊 2026-10-21). Quality changes, dialogue and
 // the walk through the gate never re-roll it.
 const rollWeather=()=>forced||(Math.random()<.9?'rain':'clear');
 let weather=rollWeather();
-const olderMobile=matchMedia('(pointer:coarse)').matches&&((navigator.deviceMemory||4)<=4||(navigator.hardwareConcurrency||8)<=4);
-let scene,game,quality=query.get('q')||(olderMobile?'low':'high'),paused=false,inspectFrozen=false,inspectUpdate;
+// iOS Safari and WeChat report no deviceMemory; an unknown value is not evidence of an old phone,
+// so every phone starts on the fine tier and only what the device actually reports demotes it.
+// A phone that cannot keep up is handled by the frame-rate governor below (lower resolution,
+// same effects), so a phone shows the desktop's picture.
+const known=(v,lim)=>typeof v==='number'&&v>0&&v<lim;
+const olderMobile=matchMedia('(pointer:coarse)').matches&&(known(navigator.deviceMemory,3)||known(navigator.hardwareConcurrency,4));
+const validQuality=q=>['low','high','ultra'].includes(q);
+let savedQuality;try{savedQuality=localStorage.getItem('arrival-quality');}catch{/* Storage may be unavailable in private browsers. */}
+let scene,game,quality=validQuality(query.get('q'))?query.get('q'):validQuality(savedQuality)?savedQuality:olderMobile?'low':'high',paused=false,inspectFrozen=false,inspectUpdate,resScale=1;
 const state=new Journey(),paperLayer=$('map-layer'),paperContext=paperLayer.getContext('2d');
-const viewport=()=>renderSize(innerWidth,innerHeight,devicePixelRatio,quality);
+const viewport=()=>renderSize(innerWidth,innerHeight,devicePixelRatio,quality,resScale);
 function resizePaper(){const v=viewport();paperLayer.width=v.width;paperLayer.height=v.height;paperContext.baseScale=v.width/Math.max(1,innerWidth);}
 function notice(message='',error=false){$('notice').hidden=!message;$('message').textContent=message;$('retry').hidden=!error;}
 async function loadImage(url){
@@ -112,10 +119,14 @@ async function answer(r,id){
 }
 
 const ASSETS={plate:'gate-plate.webp',doorL:'door-left.webp',doorR:'door-right.webp',hole:'door-hole.png'};
+const useHDEnvironment=()=>quality!=='low'&&query.get('environment')!=='original';
+const environmentURL=(k,f,hd)=>hd&&k!=='hole'?'assets/gate-hd/'+f.replace('.webp','-2x.webp'):'assets/gate/'+f;
 const POSES=['allow','allow-empty','offer','refuse','refuse-empty'];
 class Arrival extends Phaser.Scene {
  create(){
   scene=this;this.cameras.main.visible=false;this.ready=false;this.gate=null;this.fx=null;this.images=null;
+  // a faint vignette keeps the eye on the lit gate; one cheap pass, the night's colour is untouched (WebGL only)
+  this.cameras.main.filters?.internal.addVignette(.5,.48,.95,.22,0x0a0614);
   resizePaper();paintPaper();
   this.mascot=new Mascot($('mascot'));
   // the first screenful of map is painted before the curtain lifts
@@ -128,16 +139,17 @@ class Arrival extends Phaser.Scene {
   if(this.loading)return;this.loading=true;state.error=false;notice();
   try{
    if(!this.images){
-    const entries=[...Object.entries(ASSETS).map(([k,f])=>[k,'assets/gate/'+f]),['guardSheet','assets/pixel-guard/guard-v4.webp'],['guardRims','assets/pixel-guard/guard-v4-rim.webp'],...POSES.map(p=>['guard:'+p,'assets/gate/guard-'+p+'.webp'])];
+    const environmentHD=useHDEnvironment();
+    const entries=[...Object.entries(ASSETS).map(([k,f])=>[k,environmentURL(k,f,environmentHD)]),['guardSheet','assets/pixel-guard/guard-v4.webp'],['guardRims','assets/pixel-guard/guard-v4-rim.webp'],...POSES.map(p=>['guard:'+p,'assets/gate/guard-'+p+'.webp'])];
     const [loaded,guardMeta]=await Promise.all([Promise.all(entries.map(([k,u])=>loadImage(u).then(img=>[k,img]))),
      fetch('assets/pixel-guard/guard-v4.json').then(r=>{if(!r.ok)throw Error('HTTP '+r.status);return r.json();})]);
-    const im={guard:{},guardMeta};for(const [k,img] of loaded){if(k.startsWith('guard:'))im.guard[k.slice(6)]=img;else im[k]=img;}
+    const im={guard:{},guardMeta,environmentHD};for(const [k,img] of loaded){if(k.startsWith('guard:'))im.guard[k.slice(6)]=img;else im[k]=img;}
     await dialog.portrait.load(im.guard);this.images=im;
    }
   }catch(error){console.warn(error);this.loading=false;state.error=true;notice('沿途画面未能载入，检查网络后可继续旅程。',true);return;}
   this.loading=false;
   // The door preview ends at the threshold; only the approach needs baking.
-  this.paintLater();
+  if(this.images.environmentHD!==useHDEnvironment())this.changeEnvironment();else this.paintLater();
  }
  paintLater(){
   clearTimeout(this.paintTimer);
@@ -149,7 +161,7 @@ class Arrival extends Phaser.Scene {
  install(){
   this.gate?.destroy();this.fx?.destroy();
   this.gate=createGate(this,{images:{...this.images,approach:this.approach},weather,quality});
-  this.gateWeather=weather;this.makeFX();this.placeCamera(0,true);this.ready=true;state.ready=true;if(!state.error)notice();
+  this.gateWeather=weather;this.gateQuality=quality;this.makeFX();this.placeCamera(0,true);this.ready=true;state.ready=true;if(!state.error)notice();
  }
  makeFX(){
   this.fx?.destroy();if(!this.gate)return;
@@ -166,7 +178,17 @@ class Arrival extends Phaser.Scene {
   const c=this.gate.aim(v,dt,snap);
   cam.setZoom(c.z);cam.centerOn(c.x,c.y);
  }
- applyQuality(){this.game.loop.setFPSLimit(60);if(this.gate)this.makeFX();}
+ async changeEnvironment(){
+  const version=this.environmentLoad=(this.environmentLoad||0)+1,hd=useHDEnvironment();
+  if(!this.images)return;
+  if(this.images.environmentHD===hd){if(this.gateQuality!==quality)this.paintLater();else if(this.gate)this.makeFX();return;}
+  try{
+   const entries=await Promise.all(Object.entries(ASSETS).filter(([k])=>k!=='hole').map(async([k,f])=>[k,await loadImage(environmentURL(k,f,hd))]));
+   if(version!==this.environmentLoad)return;
+   this.images={...this.images,...Object.fromEntries(entries),environmentHD:hd};this.paintLater();
+  }catch(error){if(version!==this.environmentLoad)return;console.warn('环境清晰度切换未完成',error);notice('这档环境素材暂未载入，当前画面可继续；可重新切换画质重试。');}
+ }
+ applyQuality(){this.game.loop.setFPSLimit(60);if(this.images)this.changeEnvironment();}
  restart(){
   run++;timers.length=0;
   state.reset();mapSeed=(Date.now()%99991)+1;W=createWorld(mapSeed);atlas=createAtlas(W);mapCam.init=false;
@@ -179,6 +201,7 @@ class Arrival extends Phaser.Scene {
  }
  update(time,delta){
   if(paused||document.hidden)return;
+  govern(delta);
   if(review.at!=null&&state.ready){while(state.time<review.at&&state.phase!=='arrived')state.tick(1/60);review.at=null;review.hold=state.phase!=='arrived';}
   const dt=review.hold?0:Math.min(delta/1000,.1);
   state.tick(dt);tickTimers(dt);this.cameras.main.visible=state.phase!=='map';
@@ -208,7 +231,20 @@ $('retry').onclick=()=>{state.error=false;scene?.beginAssets();};
 $('replay').onclick=()=>scene?.restart();
 // Phaser's FIT keeps the previous aspect after a game-size change, so refit explicitly.
 const refit=()=>{const v=viewport();if(!game)return;game.scale.resize(v.width,v.height);game.scale.displaySize.setAspectRatio(v.width/v.height);game.scale.refresh();};
-$('quality').onchange=e=>{quality=e.target.value;e.target.blur();refit();scene?.applyQuality();};
+$('quality').onchange=e=>{quality=e.target.value;try{localStorage.setItem('arrival-quality',quality);}catch{}resScale=1;frames.length=0;calm=0;e.target.blur();refit();scene?.applyQuality();};
+// Frame-rate governor: if the median frame over ~2 s stays above 19 ms (under ~52 fps), step the
+// canvas resolution down by 12%, at most to 60%. Effects and weather are never cut. Long stalls
+// (tab switches, baking, shader warm-up) are ignored; ?q= or a manual tier choice resets it.
+const frames=[];let calm=0;
+function govern(delta){
+ // Ultra is an explicit image-quality choice: do not silently reduce its resolution.
+ if(quality==='ultra'){frames.length=0;return;}
+ if(delta>100||state.phase==='map'&&!state.ready){frames.length=0;return;}
+ if((calm-=delta)>0)return;
+ frames.push(delta);if(frames.length<120)return;
+ const m=[...frames].sort((a,b)=>a-b)[60];frames.length=0;
+ if(m>19&&resScale>.6){resScale=Math.max(.6,resScale*.88);calm=1500;refit();console.info('画面分辨率自动降至',resScale.toFixed(2),'中位帧',m.toFixed(1),'ms');}
+}
 $('pause').onclick=()=>{paused=!paused;$('pause').textContent=paused?'继续':'暂停';$('pause').setAttribute('aria-pressed',String(paused));if(paused)game?.loop.sleep();else if(!document.hidden)game?.loop.wake();};
 let resizeTimer;window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(refit,150)});
 document.addEventListener('visibilitychange',()=>{if(document.hidden)game?.loop.sleep();else if(!paused)game?.loop.wake();});

@@ -118,7 +118,7 @@ export function paintLampPost(g,x,y){
 }
 
 export function paintApproach({weather='clear',quality='high'}={}){
- const low=quality==='low',S=low?.5:.72,A=APPROACH,c=canvas(A.w*S,A.h*S),g=c.getContext('2d'),rnd=random(9157);
+ const low=quality==='low',S=low?.5:quality==='ultra'?1.5:1,A=APPROACH,c=canvas(A.w*S,A.h*S),g=c.getContext('2d'),rnd=random(9157);
  g.setTransform(S,0,0,S,-A.x*S,-A.y*S);
  const rain=weather==='rain';
  // ---------- meadow ----------
@@ -234,14 +234,17 @@ export function paintApproach({weather='clear',quality='high'}={}){
 // the smeared wedge west of the forecourt. Edges are feathered so the road shows through.
 export function trimPlate(img){
  const c=canvas(img.width,img.height),g=c.getContext('2d');g.drawImage(img,0,0);
+ // Mask coordinates remain scene units even when the source image has twice the pixels.
+ g.save();g.scale(img.width/1181,img.height/1260);
  g.globalCompositeOperation='destination-out';
  const cut=[[0,768],[150,780],[298,822],[346,858],[424,858],[470,892],[560,930],[628,962],[604,990],[545,1028],[492,1078],[478,1110],[478,1260],[0,1260]];
  const poly=()=>{g.beginPath();cut.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.closePath();};
  poly();g.fillStyle='#000';g.fill();
  g.lineJoin='round';for(const [w,a] of [[14,.3],[7,.5]]){poly();g.lineWidth=w;g.strokeStyle=`rgba(0,0,0,${a})`;g.stroke();}
- const gr=g.createLinearGradient(0,1072,0,1116);gr.addColorStop(0,'rgba(0,0,0,0)');gr.addColorStop(1,'#000');g.fillStyle=gr;g.fillRect(0,1072,img.width,img.height-1072);
- g.globalCompositeOperation='source-over';
- sharpen(c,.55);
+ const gr=g.createLinearGradient(0,1072,0,1116);gr.addColorStop(0,'rgba(0,0,0,0)');gr.addColorStop(1,'#000');g.fillStyle=gr;g.fillRect(0,1072,1181,1260-1072);
+ g.restore();g.globalCompositeOperation='source-over';
+ // HD artwork already contains the offline edge pass. Do not sharpen it twice.
+ if(img.width<=1181)sharpen(c,.55);
  return c;
 }
 

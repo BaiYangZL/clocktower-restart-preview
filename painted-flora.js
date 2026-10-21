@@ -18,8 +18,8 @@ function canvas(w,h){const c=document.createElement('canvas');c.width=Math.ceil(
 // One mass of foliage in the gate art's manner: many small scalloped leaf clusters (a round
 // heart and six or seven rounded lobes, thin ink edge), the deep green showing in the gaps,
 // clusters towards the light paler and yellower, lower ones overlapping upper ones.
-export function paintClump(r,{tone='lit',light=[-.6,-.8],seed=1,flat=1}={}){
- const P=GREENS[tone],rnd=random(seed*7919+13),pad=10,S=RES,W=(r*2+pad*2)*S,H=(r*2*flat+pad*2)*S,c=canvas(W,H),g=c.getContext('2d');
+export function paintClump(r,{tone='lit',light=[-.6,-.8],seed=1,flat=1,resolution=RES}={}){
+ const P=GREENS[tone],rnd=random(seed*7919+13),pad=10,S=resolution,W=(r*2+pad*2)*S,H=(r*2*flat+pad*2)*S,c=canvas(W,H),g=c.getContext('2d');
  const cx=W/2,cy=H/2,ry=r*flat;
  const ll=Math.hypot(light[0],light[1])||1,lx=light[0]/ll,ly=light[1]/ll;
  // the dark body the clusters sit on
@@ -55,8 +55,8 @@ export function paintClump(r,{tone='lit',light=[-.6,-.8],seed=1,flat=1}={}){
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 
 // trunk and limbs as one texture; returns the points where the clumps hang
-export function paintTrunk(h,{seed=1,lean=0,limbs=[]}={}){
- const S=RES,W=(h*.9+20)*S,H=(h+14)*S,c=canvas(W,H),g=c.getContext('2d'),bx=W/2,by=H-8*S;
+export function paintTrunk(h,{seed=1,lean=0,limbs=[],resolution=RES}={}){
+ const S=resolution,W=(h*.9+20)*S,H=(h+14)*S,c=canvas(W,H),g=c.getContext('2d'),bx=W/2,by=H-8*S;
  const pts=[];
  const limb=(x0,y0,x1,y1,w0,w1)=>{
   const mx=(x0+x1)/2+(y1-y0)*.12,my=(y0+y1)/2;
@@ -90,19 +90,19 @@ function addTex(scene,c){const key='flora-'+(texId++);scene.textures.addCanvas(k
 // With a shared cache (many roadside trees), a few painted clumps and trunks are reused,
 // scaled to size: painting each one afresh would cost seconds and much texture memory.
 const R0=64,H0=320;
-export function makeTree(scene,{x,y,depth,trunk,clumps,seed=1,light,stiff=1,cache=null}){
- const parts=[],objs=[];
+export function makeTree(scene,{x,y,depth,trunk,clumps,seed=1,light,stiff=1,cache=null,resolution=RES}){
+ const parts=[],objs=[],S=resolution;
  if(trunk){
   let key,k=1,t;
-  if(cache){const id='t|'+(seed%4);if(!cache.has(id)){t=paintTrunk(H0,{seed:11+(seed%4)*7,lean:((seed%4)-1.5)*.06,limbs:[[.62,-60,-50,11],[.72,70,-56,10],[.5,-90,-24,8]]});cache.set(id,{key:addTex(scene,t.canvas),t});}
+  if(cache){const id='t|'+S+'|'+(seed%4);if(!cache.has(id)){t=paintTrunk(H0,{resolution:S,seed:11+(seed%4)*7,lean:((seed%4)-1.5)*.06,limbs:[[.62,-60,-50,11],[.72,70,-56,10],[.5,-90,-24,8]]});cache.set(id,{key:addTex(scene,t.canvas),t});}
    ({key,t}=cache.get(id));k=trunk.h/H0;}
-  else{t=paintTrunk(trunk.h,{seed,lean:trunk.lean||0,limbs:trunk.limbs||[]});key=addTex(scene,t.canvas);}
-  const im=scene.add.image(x,y,key).setOrigin(t.ox/(t.canvas.width/RES),t.oy/(t.canvas.height/RES)).setScale(k/RES).setDepth(depth);objs.push(im);}
+  else{t=paintTrunk(trunk.h,{resolution:S,seed,lean:trunk.lean||0,limbs:trunk.limbs||[]});key=addTex(scene,t.canvas);}
+  const im=scene.add.image(x,y,key).setOrigin(t.ox/(t.canvas.width/S),t.oy/(t.canvas.height/S)).setScale(k/S).setDepth(depth);objs.push(im);}
  clumps.forEach(([dx,dy,r,tone,flat],i)=>{
   let key,k=1;
-  if(cache){const id=tone+'|'+(flat||1)+'|'+((seed*17+i)%4);if(!cache.has(id))cache.set(id,addTex(scene,paintClump(R0,{tone,light,seed:97+((seed*17+i)%4)*31+tone.length,flat:flat||1}).canvas));key=cache.get(id);k=r/R0;}
-  else key=addTex(scene,paintClump(r,{tone,light,seed:seed*17+i,flat:flat||1}).canvas);
-  const im=scene.add.image(x+dx,y+dy,key).setScale(k/RES).setDepth(depth+(cache?2e-6*(1+i):.01+i*.001));objs.push(im);
+  if(cache){const id=S+'|'+tone+'|'+(flat||1)+'|'+((seed*17+i)%4);if(!cache.has(id))cache.set(id,addTex(scene,paintClump(R0,{resolution:S,tone,light,seed:97+((seed*17+i)%4)*31+tone.length,flat:flat||1}).canvas));key=cache.get(id);k=r/R0;}
+  else key=addTex(scene,paintClump(r,{resolution:S,tone,light,seed:seed*17+i,flat:flat||1}).canvas);
+  const im=scene.add.image(x+dx,y+dy,key).setScale(k/S).setDepth(depth+(cache?2e-6*(1+i):.01+i*.001));objs.push(im);
   // it sways about a point above-and-toward the trunk, more the higher and further out it is
   parts.push({im,x:x+dx,y:y+dy,r,amp:(.008+.006*Math.min(1,-dy/160))/stiff,ph:seed*1.7+i*.9,hx:-dx*.25,hy:r*.6});
  });
@@ -112,7 +112,7 @@ export function makeTree(scene,{x,y,depth,trunk,clumps,seed=1,light,stiff=1,cach
    for(const p of parts){const a=p.amp*(Math.sin(t*1.25+p.ph)+.45*Math.sin(t*2.9+p.ph*1.3))*wind+p.amp*.6*(wind-1);
     // rotate about the hanging point (hx,hy below the clump centre)
     const c=Math.cos(a),s=Math.sin(a);p.im.setRotation(a).setPosition(p.x+p.hx-(p.hx*c-p.hy*s),p.y+p.hy-(p.hx*s+p.hy*c));}},
-  destroy(){for(const o of objs)o.destroy();}};
+  destroy(){const keys=new Set(objs.map(o=>o.texture.key));for(const o of objs)o.destroy();if(!cache)for(const key of keys)scene.textures.remove(key);}};
 }
 
 // A low bush or hedge mass: clumps only, gentle sway.

@@ -12,9 +12,9 @@ function tex(scene,key,w,h,draw){if(scene.textures.exists(key))return;const c=do
 const rad=(g,x,y,r,stops)=>{const gr=g.createRadialGradient(x,y,0,x,y,r);for(const [k,c] of stops)gr.addColorStop(k,c);return gr;};
 const D={mist:33,map:34,ground:35,glow:36,flies:37,rain:40};
 
-function paintLightMap(scene,{bounds,lamps,windows,rain,low,canopies=[]}){
- // a quarter-resolution map is plenty: light is soft
- const S=low?.18:.25,c=document.createElement('canvas');c.width=Math.ceil(bounds.w*S);c.height=Math.ceil(bounds.h*S);
+function paintLightMap(scene,{bounds,lamps,windows,rain,low,ultra,canopies=[]}){
+ // Ultra doubles sampling precision without changing light placement, softness or brightness.
+ const S=low?.18:ultra?.5:.25,c=document.createElement('canvas');c.width=Math.ceil(bounds.w*S);c.height=Math.ceil(bounds.h*S);
  const g=c.getContext('2d');g.setTransform(S,0,0,S,-bounds.x*S,-bounds.y*S);
  // Ambient: a violet-indigo night (never grey-blue), a little deeper with distance from the gate
  // so the eye travels up the road to the warm doorway.
@@ -53,8 +53,7 @@ export function createFX(scene,{weather,quality,gate}){
  const objsWorld=[];
 
  // ---------- the night ----------
- add(paintLightMap(scene,{bounds,lamps,windows,rain,low,canopies}));
- if(!low&&scene.cameras.main.filters){/* the scene's own vignette keeps the eye on the lit gate */}
+ add(paintLightMap(scene,{bounds,lamps,windows,rain,low,ultra:quality==='ultra',canopies}));
 
  // ---------- lamps ----------
  const halos=[];
@@ -142,7 +141,9 @@ export function createFX(scene,{weather,quality,gate}){
     f.halo.setPosition(x,y).setAlpha(.8*on);f.core.setPosition(x,y).setAlpha(on);}
    for(const m of mist){m.u=(m.u+m.sp*dt)%1.4;m.im.setPosition(v.x+v.width*(m.u-.2),v.y+v.height*m.v).setDisplaySize(v.width*.9,v.height*.35).setAlpha(m.a*dry);}
    if(!rain)return;
-   for(const L of layers){L.off+=dt*L.speed;L.t.setPosition(v.x,v.y).setSize(v.width*z,v.height*z).setScale(1/z);L.t.tilePositionY=-L.off;L.t.tilePositionX=L.off*.08;L.t.setAlpha(L.alpha*dry);}
+   // streaks are sized in CSS px, so a sharper canvas does not turn them into hairlines
+   const cv=scene.game.canvas,d=Math.max(1,cv.width/(cv.clientWidth||cv.width)),zs=z/d;
+   for(const L of layers){L.off+=dt*L.speed;L.t.setPosition(v.x,v.y).setSize(v.width*zs,v.height*zs).setScale(1/zs);L.t.tilePositionY=-L.off;L.t.tilePositionX=L.off*.08;L.t.setAlpha(L.alpha*dry);}
    for(const r of litRain){r.t+=dt;if(r.t>.06){r.t=0;r.v=(r.v+1+((Math.random()*3)|0))%5;r.im.setTexture('fx-litrain-'+r.v).setFlipX(Math.random()<.5);}r.im.setVisible(dry>.05);}
    const inView=(x,y)=>x>v.x&&x<v.x+v.width&&y>v.y&&y<v.y+v.height;
    for(const r of ripples){r.t+=dt;if(r.t>r.life){r.t=0;r.life=.6+Math.random()*.4;const p=puddles.length?puddles[(Math.random()*puddles.length)|0]:null;

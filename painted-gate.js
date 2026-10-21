@@ -30,12 +30,12 @@ const PASSAGE=130;
 export const MAX_DOOR=1.95;
 
 function canvas(w,h){const c=document.createElement('canvas');c.width=Math.ceil(w);c.height=Math.ceil(h);return c;}
-function maskBy(c,mask,dx=0,dy=0){const g=c.getContext('2d');g.save();g.setTransform(1,0,0,1,0,0);g.globalCompositeOperation='destination-in';g.drawImage(mask,dx*RES,dy*RES,HOLE.w*RES,HOLE.h*RES);g.restore();}
+function maskBy(c,mask){const g=c.getContext('2d');g.save();g.setTransform(1,0,0,1,0,0);g.globalCompositeOperation='destination-in';g.drawImage(mask,0,0,c.width,c.height);g.restore();}
 
 // No proposed town art is visible through the opened leaves. The dark opening is
 // deliberately neutral until the actual town design has been chosen.
-function paintPassage(mask){
- const c=canvas(HOLE.w*RES,HOLE.h*RES),g=c.getContext('2d');g.scale(RES,RES);
+function paintPassage(mask,S=RES){
+ const c=canvas(HOLE.w*S,HOLE.h*S),g=c.getContext('2d');g.scale(S,S);
  const shade=g.createLinearGradient(0,0,0,HOLE.h);
  shade.addColorStop(0,'#171724');shade.addColorStop(.55,'#171421');shade.addColorStop(1,'#332a31');
  g.fillStyle=shade;g.fillRect(0,0,HOLE.w,HOLE.h);
@@ -56,13 +56,15 @@ export function doorLeafPoint(s,angle,u,h){const f=LEAF[s],m=leafMatrix(s,angle)
 
 export function createGate(scene,{images,weather,quality}){
  const low=quality==='low',objs=[],add=o=>(objs.push(o),o);
+ const floraResolution=low||!images.environmentHD?RES:quality==='ultra'?4:3;
+ const detail=quality==='ultra'?4:RES;
  const T=(key,img)=>{if(scene.textures.exists(key))scene.textures.remove(key);scene.textures.addImage(key,img);scene.textures.get(key).setFilter(Phaser.Textures.FilterMode.LINEAR);return key;};
  const TC=(key,c)=>{if(scene.textures.exists(key))scene.textures.remove(key);const t=scene.textures.addCanvas(key,c);t.setFilter(Phaser.Textures.FilterMode.LINEAR);return t;};
  // the road out to the south-west lies under the art; the art's filler band and wedge are cut away
  {const key='gate-approach',a=images.approach;if(scene.textures.exists(key))scene.textures.remove(key);scene.textures.addCanvas(key,a.canvas).setFilter(Phaser.Textures.FilterMode.LINEAR);
   add(scene.add.image(APPROACH.x,APPROACH.y,key).setOrigin(0,0).setScale(1/a.scale).setDepth(-1));}
  TC('gate-plate',trimPlate(images.plate));
- add(scene.add.image(0,0,'gate-plate').setOrigin(0,0).setDepth(0));
+ add(scene.add.image(0,0,'gate-plate').setOrigin(0,0).setDisplaySize(WORLD.w,WORLD.h).setDepth(0));
  // soft shadow texture for the guard and props
  {const c=canvas(128,32),g=c.getContext('2d'),r=g.createRadialGradient(64,16,0,64,16,64);r.addColorStop(0,'rgba(8,6,16,.9)');r.addColorStop(.55,'rgba(8,6,16,.45)');r.addColorStop(1,'rgba(8,6,16,0)');g.setTransform(1,0,0,.25,0,12);g.fillStyle=r;g.fillRect(0,-48,128,128);TC('g-shadow',c);}
  // wet night: the dry painting gets a cool sheen, warm reflections under each lamp and a few puddles
@@ -83,10 +85,10 @@ export function createGate(scene,{images,weather,quality}){
  // the opening's mask is stored as greyscale; masking needs it as alpha
  const hole=(()=>{const im=images.hole,c=canvas(im.width,im.height),g=c.getContext('2d');g.drawImage(im,0,0);const d=g.getImageData(0,0,c.width,c.height);
   for(let i=0;i<d.data.length;i+=4){d.data[i+3]=d.data[i];d.data[i]=d.data[i+1]=d.data[i+2]=255;}g.putImageData(d,0,0);return c;})();
- const passage=paintPassage(hole);
+ const passage=paintPassage(hole,detail);
  const dark={};for(const s of ['L','R']){const im=s==='L'?images.doorL:images.doorR,c=canvas(im.width,im.height),g=c.getContext('2d');g.drawImage(im,0,0);g.globalCompositeOperation='source-atop';g.fillStyle='#0c0814';g.fillRect(0,0,c.width,c.height);dark[s]=c;}
- const dc=canvas(HOLE.w*RES,HOLE.h*RES),dg=dc.getContext('2d');const dTex=TC('gate-doorway',dc);
- const doorway=add(scene.add.image(HOLE.x,HOLE.y,'gate-doorway').setOrigin(0,0).setScale(1/RES).setDepth(2).setVisible(false));
+ const dc=canvas(HOLE.w*detail,HOLE.h*detail),dg=dc.getContext('2d');const dTex=TC('gate-doorway',dc);
+ const doorway=add(scene.add.image(HOLE.x,HOLE.y,'gate-doorway').setOrigin(0,0).setScale(1/detail).setDepth(2).setVisible(false));
  let lastAngle=-1;
  function drawDoor(angle){
   if(Math.abs(angle-lastAngle)<.002)return;lastAngle=angle;
@@ -95,13 +97,14 @@ export function createGate(scene,{images,weather,quality}){
   for(const s of ['L','R']){const m=leafMatrix(s,angle),im=s==='L'?images.doorL:images.doorR,[tx,ty]=LEAF[s].tex;
    const hx=m.hx-HOLE.x;
    // in hole-local px: x' = hx + a(x-hx), y' = y + b(x-hx)
-   dg.setTransform(RES*m.a,RES*m.b,0,RES,RES*(hx-m.a*hx),-RES*m.b*hx);
-   dg.drawImage(im,tx-HOLE.x,ty-HOLE.y);
+   dg.setTransform(detail*m.a,detail*m.b,0,detail,detail*(hx-m.a*hx),-detail*m.b*hx);
+   const dw=s==='L'?82:66,dh=s==='L'?274:292;
+   dg.drawImage(im,tx-HOLE.x,ty-HOLE.y,dw,dh);
    // turning away from the lamps, the wood darkens
-   dg.globalAlpha=clamp(Math.sin(Math.min(angle,1.57))*.55+Math.max(0,angle-1.57)*.4,0,.8);dg.drawImage(dark[s],tx-HOLE.x,ty-HOLE.y);dg.globalAlpha=1;
+   dg.globalAlpha=clamp(Math.sin(Math.min(angle,1.57))*.55+Math.max(0,angle-1.57)*.4,0,.8);dg.drawImage(dark[s],tx-HOLE.x,ty-HOLE.y,dw,dh);dg.globalAlpha=1;
    // the leaf's thickness along the meeting stile
    const top=apply(m,STILE,560),bot=apply(m,STILE,s==='L'?806:808);
-   dg.setTransform(RES,0,0,RES,0,0);dg.strokeStyle='#2a170e';dg.lineWidth=2.4*Math.min(1,angle*2);dg.beginPath();dg.moveTo(top.x-HOLE.x,top.y-HOLE.y);dg.lineTo(bot.x-HOLE.x,bot.y-HOLE.y);dg.stroke();
+   dg.setTransform(detail,0,0,detail,0,0);dg.strokeStyle='#2a170e';dg.lineWidth=2.4*Math.min(1,angle*2);dg.beginPath();dg.moveTo(top.x-HOLE.x,top.y-HOLE.y);dg.lineTo(bot.x-HOLE.x,bot.y-HOLE.y);dg.stroke();
   }
   maskBy(dc,hole);
   dTex.refresh();
@@ -121,15 +124,15 @@ export function createGate(scene,{images,weather,quality}){
  // ---------- foreground planting ----------
  const light=[.75,-.65];
  const flora=[];
- const treeA=makeTree(scene,{x:10,y:1190,depth:30,seed:3,light,trunk:{h:380,lean:.1,limbs:[[.62,-60,-50,12],[.75,80,-60,11],[.55,110,-20,9]]},
+ const treeA=makeTree(scene,{resolution:floraResolution,x:10,y:1190,depth:30,seed:3,light,trunk:{h:380,lean:.1,limbs:[[.62,-60,-50,12],[.75,80,-60,11],[.55,110,-20,9]]},
   clumps:[[-20,-560,72,'lit'],[90,-600,78,'lit'],[190,-540,66,'lit'],[10,-450,78,'cool'],[130,-470,82,'cool'],[235,-430,58,'cool'],[60,-380,70,'cool']]});
  treeA.floor=1160;flora.push(treeA);
- const treeB=makeTree(scene,{x:1120,y:1250,depth:30,seed:9,light:[-.7,-.7],trunk:{h:330,lean:-.08,limbs:[[.6,-90,-50,12],[.5,50,-40,10]]},
+ const treeB=makeTree(scene,{resolution:floraResolution,x:1120,y:1250,depth:30,seed:9,light:[-.7,-.7],trunk:{h:330,lean:-.08,limbs:[[.6,-90,-50,12],[.5,50,-40,10]]},
   clumps:[[-140,-380,68,'lit'],[-40,-420,82,'lit'],[60,-380,72,'cool'],[-170,-280,68,'cool'],[-60,-300,82,'cool'],[50,-260,76,'near'],[-120,-180,66,'near']]});
  treeB.floor=1255;flora.push(treeB);
  // hedges along the bottom: the west mass stands beside the road now, which runs on out of the view
- const hedgeL=makeBush(scene,{x:0,y:1200,depth:31,seed:21,light,clumps:[[60,-350,78,'cool',.8],[170,-370,72,'cool',.8],[285,-330,62,'cool',.8],[335,-255,50,'near',.8],[40,-225,88,'near',.8],[160,-235,82,'near',.8],[70,-85,92,'near',.75],[-40,-10,88,'near',.75],[-10,80,80,'near',.7],[-120,60,84,'near',.7]].filter(([dx,dy,r])=>roadClearance(dx,1200+dy)>ROAD_HALF+r*.7)});
- const hedgeR=makeBush(scene,{x:600,y:1200,depth:31,seed:33,light:[-.7,-.7],clumps:[[20,30,58,'near',.75],[120,10,66,'near',.75],[240,-10,70,'near',.75],[360,10,66,'near',.75],[460,-20,74,'near',.75],[560,0,66,'near',.75],[180,60,74,'near',.7],[400,70,78,'near',.7]]});
+ const hedgeL=makeBush(scene,{resolution:floraResolution,x:0,y:1200,depth:31,seed:21,light,clumps:[[60,-350,78,'cool',.8],[170,-370,72,'cool',.8],[285,-330,62,'cool',.8],[335,-255,50,'near',.8],[40,-225,88,'near',.8],[160,-235,82,'near',.8],[70,-85,92,'near',.75],[-40,-10,88,'near',.75],[-10,80,80,'near',.7],[-120,60,84,'near',.7]].filter(([dx,dy,r])=>roadClearance(dx,1200+dy)>ROAD_HALF+r*.7)});
+ const hedgeR=makeBush(scene,{resolution:floraResolution,x:600,y:1200,depth:31,seed:33,light:[-.7,-.7],clumps:[[20,30,58,'near',.75],[120,10,66,'near',.75],[240,-10,70,'near',.75],[360,10,66,'near',.75],[460,-20,74,'near',.75],[560,0,66,'near',.75],[180,60,74,'near',.7],[400,70,78,'near',.7]]});
  flora.push(hedgeL,hedgeR);objs.push(...flora);
  // clumps near a lamp take its warmth, lit from above; the rest stay cool and deep
  for(const f of flora)for(const p of f.parts){let k=0;for(const l of FX_LAMPS){const d=Math.hypot(l.x-p.x,(l.y-p.y)*1.2);k+=1/(1+(d/(l.r*.7))**2);}k=clamp(k);
@@ -142,15 +145,15 @@ export function createGate(scene,{images,weather,quality}){
  // ---------- the old road's trees, bushes and lamps: live, so they sway and shed leaves ----------
  // They stand under the shared night map, sorted by their feet; a few painted clumps are shared.
  const cache=new Map(),roadside=[],at=y=>-.9+y*1e-4;
- {const c=canvas(64*RES,240*RES),g=c.getContext('2d');g.scale(RES,RES);paintLampPost(g,32,232);TC('road-lamp',c);}
+ {const c=canvas(64*detail,240*detail),g=c.getContext('2d');g.scale(detail,detail);paintLampPost(g,32,232);TC('road-lamp',c);}
  for(const p of images.approach.props){
-  if(p.kind==='lamp'){add(scene.add.image(p.x,p.y+8,'road-lamp').setOrigin(.5,232/240).setScale(1/RES).setDepth(at(p.y)));continue;}
+  if(p.kind==='lamp'){add(scene.add.image(p.x,p.y+8,'road-lamp').setOrigin(.5,232/240).setScale(1/detail).setDepth(at(p.y)));continue;}
   const sc=p.scale||1,lt=[.7,-.7];let t;
   if(p.kind==='tree'){const top=p.h*.78,R=62*sc,tones=p.tones,rr=k=>R*k*(.9+((p.seed*7+k*13)%10)/50);
    const cl=[[-80,-top-10,.9,0],[20,-top-60,1,0],[100,-top-5,.85,0],[-50,-top+80,1,1],[60,-top+70,1.05,1],[-110,-top+140,.8,2],[10,-top+150,.95,2],[110,-top+120,.75,2]]
     .filter((_,i)=>(p.seed>>i)%7!==0).map(([dx,dy,k,ti])=>[dx*sc,dy,rr(k),tones[ti]]);
-   t=makeTree(scene,{x:p.x,y:p.y,depth:at(p.y),seed:p.seed,light:lt,cache,trunk:{h:p.h},clumps:cl});}
-  else t=makeBush(scene,{x:p.x,y:p.y,depth:at(p.y),seed:p.seed,light:lt,cache,clumps:Array.from({length:p.n},(_,i)=>[(i-(p.n-1)/2)*p.r*.9,-p.r*.5,p.r*(.85+((p.seed+i)%5)*.08),i>p.n/2?'near':'cool',.8])});
+   t=makeTree(scene,{resolution:floraResolution,x:p.x,y:p.y,depth:at(p.y),seed:p.seed,light:lt,cache,trunk:{h:p.h},clumps:cl});}
+  else t=makeBush(scene,{resolution:floraResolution,x:p.x,y:p.y,depth:at(p.y),seed:p.seed,light:lt,cache,clumps:Array.from({length:p.n},(_,i)=>[(i-(p.n-1)/2)*p.r*.9,-p.r*.5,p.r*(.85+((p.seed+i)%5)*.08),i>p.n/2?'near':'cool',.8])});
   t.floor=p.y+4;t.box={x0:p.x-170*sc,x1:p.x+170*sc,y0:p.y-(p.h||80)-90,y1:p.y+20};t.inView=false;roadside.push(t);objs.push(t);
  }
  const leaves=makeLeaves(scene,{trees:[treeA,treeB,hedgeL,hedgeR,...roadside.filter(t=>t.box.y1-t.box.y0>200)],depth:36.6,rate:low?.8:1.8,low,rain:weather==='rain',tint:0xb8a8b8});objs.push(leaves);
@@ -197,11 +200,15 @@ export function createGate(scene,{images,weather,quality}){
   const k=1-Math.exp(-dt*2.6);cam.x+=(target.x-cam.x)*k;cam.y+=(target.y-cam.y)*k;cam.z*=Math.pow(target.z/cam.z,k);return cam;
  }
 
+ // Inspection-only estimate of the plate and live tree RGBA textures, excluding driver copies.
+ const treeTextures=new Set([...flora,...roadside].flatMap(f=>f.objs.map(o=>o.texture)));
+ const treeBytes=[...treeTextures].reduce((sum,t)=>sum+t.source[0].width*t.source[0].height*4,0);
+ const environment={quality,hd:!!images.environmentHD,plate:[images.plate.width,images.plate.height],floraResolution,road:[images.approach.canvas.width,images.approach.canvas.height],treeBytes,treeTextures:treeTextures.size};
  let t=0;
  return {
   // what the light and weather layer needs (weather-fx.js)
   fx:{lamps:FX_LAMPS,windows:WINDOWS,puddles,canopies,eaves:EAVES,bounds:{x:APPROACH.x,y:-200,w:WORLD.w-APPROACH.x,h:APPROACH.y+APPROACH.h+200},streetLights:[]},
-  view,aim,cam,leafPoint,lightAt,guard,
+  view,aim,cam,leafPoint,lightAt,guard,environment,
   // st: {door, guard:{...}, wind}
   update(dt,st){
    t+=dt;const wind=1+.35*Math.sin(t*.37)+.2*Math.sin(t*1.13);
@@ -212,6 +219,6 @@ export function createGate(scene,{images,weather,quality}){
    {const v=scene.cameras.main.worldView;for(const r of roadside){const b=r.box;r.inView=b.x1>v.x&&b.x0<v.x+v.width&&b.y1>v.y&&b.y0<v.y+v.height;if(r.inView)r.update(dt,wind);}}
    leaves.update(dt,wind);
   },
-  destroy(){for(const o of objs)o.destroy();}
+  destroy(){for(const o of objs)o.destroy();for(const v of cache.values())scene.textures.remove(typeof v==='string'?v:v.key);cache.clear();}
  };
 }

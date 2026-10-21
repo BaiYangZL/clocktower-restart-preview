@@ -27,5 +27,7 @@ export function installReview(api){
  button('原版采样',()=>{api.scene.gate.guard.setSampling('original');api.draw();});
  button('清晰采样',()=>{api.scene.gate.guard.setSampling('sharp');api.draw();});
  document.body.append(bar);
- return ()=>{status.textContent=`审阅模式 · ${api.story.phase} · ${api.story.t.toFixed(2)}s · 门角 ${api.story.door.toFixed(2)} · ${api.frame()} · ${api.scene?.gate?.guard.sampling||'loading'}`;};
+ return ()=>{const env=api.scene?.gate?.environment;
+  const c=api.scene?.game?.canvas;
+  status.textContent=`审阅模式 · ${api.story.phase} · ${api.story.t.toFixed(2)}s · 门角 ${api.story.door.toFixed(2)} · ${api.frame()} · ${api.scene?.gate?.guard.sampling||'loading'}`+(env?` · ${env.quality} · 渲染${c.width}×${c.height} · 环境${env.plate.join('×')} · 树${env.floraResolution}×/${(env.treeBytes/1048576).toFixed(1)}MiB · 道路${env.road.join('×')}`:'');};
 }
