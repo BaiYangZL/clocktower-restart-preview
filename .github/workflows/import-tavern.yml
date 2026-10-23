@@ -1,0 +1,50 @@
+name: Import tavern preview
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: tavern-preview-import
+  cancel-in-progress: false
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+      - name: Download and verify the approved preview package
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download tavern-preview-20261024 --repo BaiYangZL/clocktower-restart-preview --pattern tavern-public-20261024.bundle --dir "$RUNNER_TEMP"
+          echo "5087398bfc17e19af72059c413b5f4021847d79c268ad38c716803bc2049dc45  $RUNNER_TEMP/tavern-public-20261024.bundle" | sha256sum --check
+          git bundle verify "$RUNNER_TEMP/tavern-public-20261024.bundle"
+          git fetch "$RUNNER_TEMP/tavern-public-20261024.bundle" main:refs/remotes/tavern-package/main
+          test "$(git rev-parse refs/remotes/tavern-package/main)" = e5f3f1be06d43c8556f800688360f74becd4f5e1
+          git checkout refs/remotes/tavern-package/main -- tavern
+      - name: Verify all published runtime bytes
+        run: |
+          node <<'JS'
+          const fs=require('fs'),path=require('path'),crypto=require('crypto'),assert=require('assert/strict');
+          const root=path.resolve('tavern');
+          const manifest=JSON.parse(fs.readFileSync(path.join(root,'release-manifest.json')));
+          assert.equal(manifest.version,'walk-speed-20261024');
+          for(const entry of manifest.entries){
+            const file=path.resolve(root,entry.path);
+            assert(file.startsWith(root+path.sep));
+            const data=fs.readFileSync(file);
+            assert.equal(data.length,entry.bytes,entry.path);
+            assert.equal(crypto.createHash('sha256').update(data).digest('hex'),entry.sha256,entry.path);
+          }
+          console.log('Verified',manifest.files,'runtime files');
+          JS
+      - name: Commit only the tavern subdirectory
+        run: |
+          if git diff --cached --quiet; then echo "Preview is already imported"; exit 0; fi
+          test -z "$(git diff --cached --name-only | grep -v '^tavern/' || true)"
+          git config user.name "Codex"
+          git config user.email "codex@users.noreply.github.com"
+          git commit -m "Publish standalone Cocos tavern preview (walk-speed-20261024)"
+          git push origin HEAD:main
