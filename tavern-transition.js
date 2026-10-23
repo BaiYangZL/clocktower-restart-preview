@@ -13,7 +13,11 @@ export function createTavernTransition({pauseGate} = {}) {
     try {
       const marker = JSON.parse(localStorage.getItem(RETURN_KEY));
       if (marker?.version === VERSION && Date.now() - marker.at >= 0 && Date.now() - marker.at < WEEK_MS) return true;
-      return localStorage.getItem('belvedere-tavern-ready-day') === current();
+      if (localStorage.getItem('belvedere-tavern-ready-day') === current()) {
+        localStorage.setItem(RETURN_KEY, JSON.stringify({at: Date.now(), version: VERSION}));
+        return true;
+      }
+      return false;
     } catch { return false; }
   }
 
@@ -95,7 +99,9 @@ export function createTavernTransition({pauseGate} = {}) {
   function reveal() {
     if (!ready || entered) return;
     entered = true; waiting = false; clearInterval(poll);
-    try { localStorage.setItem(RETURN_KEY, JSON.stringify({at: Date.now(), version: VERSION})); } catch { /* Private storage is optional. */ }
+    if (!returning) {
+      try { localStorage.setItem(RETURN_KEY, JSON.stringify({at: Date.now(), version: VERSION})); } catch { /* Private storage is optional. */ }
+    }
     curtain.querySelector('p').textContent = '炉火已亮。';
     requestAnimationFrame(() => {
       frame.style.opacity = '1'; frame.style.pointerEvents = 'auto';

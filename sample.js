@@ -8,7 +8,7 @@ import {Dialog} from './dialog.js';
 import {Mascot} from './mascot.js';
 import {createFX} from './weather-fx.js';
 import {GateStory} from './gate-story.js';
-import {createTavernTransition} from './tavern-transition.js?v=return-week-20261024';
+import {createTavernTransition} from './tavern-transition.js?v=return-week-fixed-20261024';
 const $=id=>document.getElementById(id);
 const query=new URLSearchParams(location.search);
 // Review aids only: ?at=秒 jumps the journey to that moment and holds it; ?seed= fixes the
@@ -164,7 +164,7 @@ class Arrival extends Phaser.Scene {
  install(){
   this.gate?.destroy();this.fx?.destroy();
   this.gate=createGate(this,{images:{...this.images,approach:this.approach},weather,quality});
-  this.gateWeather=weather;this.gateQuality=quality;this.makeFX();this.placeCamera(0,true);this.ready=true;state.ready=true;if(!state.error)notice();tavernTransition.prepare();tavernTransition.prepare();tavernTransition.prepare();tavernTransition.prepare();tavernTransition.prepare();tavernTransition.prepare();tavernTransition.prepare();
+  this.gateWeather=weather;this.gateQuality=quality;this.makeFX();this.placeCamera(0,true);this.ready=true;state.ready=true;if(!state.error)notice();tavernTransition.prepare();tavernTransition.prepare();tavernTransition.prepare();tavernTransition.prepare();tavernTransition.prepare();tavernTransition.prepare();tavernTransition.prepare();tavernTransition.prepare();
  }
  makeFX(){
   this.fx?.destroy();if(!this.gate)return;
