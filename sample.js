@@ -8,6 +8,7 @@ import {Dialog} from './dialog.js';
 import {Mascot} from './mascot.js';
 import {createFX} from './weather-fx.js';
 import {GateStory} from './gate-story.js';
+import {createTavernTransition} from './tavern-transition.js';
 const $=id=>document.getElementById(id);
 const query=new URLSearchParams(location.search);
 // Review aids only: ?at=秒 jumps the journey to that moment and holds it; ?seed= fixes the
@@ -68,9 +69,11 @@ const timers=[];const sleep=s=>new Promise(r=>timers.push({t:s,r}));
 function tickTimers(dt){for(let i=timers.length-1;i>=0;i--){timers[i].t-=dt;if(timers[i].t<=0){const r=timers[i].r;timers.splice(i,1);r();}}}
 
 // ---------- the gate story ----------
+const tavernTransition=createTavernTransition({pauseGate:()=>game?.loop.sleep()});
+window.__tavernEntry=tavernTransition;
 const story=new GateStory({spots:SPOTS,maxDoor:MAX_DOOR,
  leafPoint:(...args)=>scene.gate.leafPoint(...args),
- onEnd:()=>{$('ending').hidden=false;$('replay').hidden=false;}
+ onEnd:()=>tavernTransition.enter()
 }),dialog=new Dialog();
 const guardState=()=>story.guardState;
 const night=()=>weather==='rain'?'雨夜':'夜风';
@@ -161,7 +164,7 @@ class Arrival extends Phaser.Scene {
  install(){
   this.gate?.destroy();this.fx?.destroy();
   this.gate=createGate(this,{images:{...this.images,approach:this.approach},weather,quality});
-  this.gateWeather=weather;this.gateQuality=quality;this.makeFX();this.placeCamera(0,true);this.ready=true;state.ready=true;if(!state.error)notice();
+  this.gateWeather=weather;this.gateQuality=quality;this.makeFX();this.placeCamera(0,true);this.ready=true;state.ready=true;if(!state.error)notice();tavernTransition.prepare();
  }
  makeFX(){
   this.fx?.destroy();if(!this.gate)return;
