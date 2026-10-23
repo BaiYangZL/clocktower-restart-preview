@@ -1,0 +1,53 @@
+{
+    "importBase": "import",
+    "nativeBase": "native",
+    "name": "main",
+    "deps": [
+        "internal",
+        "resources"
+    ],
+    "uuids": [
+        "76adea64-9cc3-48ca-9bf3-61b15b20c611",
+        "a3cd009f-0ab0-420d-9278-b9fdab939bbc",
+        "ba21476f-2866-4f81-9c4d-6e359316e448",
+        "c8f66d17-351a-48da-a12c-0212d28575c4",
+        "fd8ec536-a354-4a17-9c74-4f3883c378c8"
+    ],
+    "paths": {
+        "76adea64-9cc3-48ca-9bf3-61b15b20c611": [
+            "db:/assets/Tavern",
+            "cc.SceneAsset",
+            1
+        ],
+        "fd8ec536-a354-4a17-9c74-4f3883c378c8": [
+            "db:/internal/default_renderpipeline/builtin-forward",
+            "cc.RenderPipeline",
+            1
+        ],
+        "ba21476f-2866-4f81-9c4d-6e359316e448": [
+            "db:/internal/physics/default-physics-material",
+            "cc.PhysicsMaterial",
+            1
+        ]
+    },
+    "scenes": {
+        "db://assets/Tavern.scene": "76adea64-9cc3-48ca-9bf3-61b15b20c611"
+    },
+    "packs": {},
+    "versions": {
+        "import": [],
+        "native": []
+    },
+    "redirect": [
+        "a3cd009f-0ab0-420d-9278-b9fdab939bbc",
+        "0",
+        "ba21476f-2866-4f81-9c4d-6e359316e448",
+        "0",
+        "c8f66d17-351a-48da-a12c-0212d28575c4",
+        "1"
+    ],
+    "debug": true,
+    "extensionMap": {},
+    "hasPreloadScript": true,
+    "dependencyRelationships": {}
+}
