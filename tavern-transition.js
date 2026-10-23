@@ -52,7 +52,6 @@ export function createTavernTransition({pauseGate} = {}) {
     try { tavern = frame.contentWindow.__tavern; } catch { /* iframe has not reached the same-origin scene yet */ }
     if (tavern?.state().ready) {
       ready = true; failed = false; clearInterval(poll);
-      try { localStorage.setItem('belvedere-tavern-ready-day', current()); } catch { /* Private storage is optional. */ }
       badge.hidden = true;
       if (waiting) reveal();
       return;
@@ -72,6 +71,15 @@ export function createTavernTransition({pauseGate} = {}) {
   async function prepare() {
     if (frame) return;
     makeUI(); startedAt = Date.now();
+    try {
+      if (localStorage.getItem('belvedere-tavern-ready-day') === current()) {
+        waiting = true;
+        curtain.hidden = false;
+        curtain.style.display = 'grid';
+        curtain.querySelector('p').textContent = '正在从今天的缓存恢复二楼场景…';
+        badge.hidden = true;
+      }
+    } catch { /* Private storage is optional. */ }
     await registerCache();
     frame.src = TAVERN.href;
     poll = setInterval(check, 350);
@@ -79,6 +87,7 @@ export function createTavernTransition({pauseGate} = {}) {
   function reveal() {
     if (!ready || entered) return;
     entered = true; waiting = false; clearInterval(poll);
+    try { localStorage.setItem('belvedere-tavern-ready-day', current()); } catch { /* Private storage is optional. */ }
     curtain.querySelector('p').textContent = '炉火已亮。';
     requestAnimationFrame(() => {
       frame.style.opacity = '1'; frame.style.pointerEvents = 'auto';
@@ -105,3 +114,4 @@ export function createTavernTransition({pauseGate} = {}) {
   }
   return {prepare, enter, status: () => ({ready, entered, waiting, failed, cacheLimited, frame: !!frame})};
 }
+
