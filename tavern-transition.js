@@ -2,11 +2,20 @@ const VERSION = 'walk-speed-20261024';
 const ROOT = new URL('./', import.meta.url);
 const TAVERN = new URL(`tavern/?v=${VERSION}`, ROOT);
 const TODAY = () => new Date().toLocaleDateString('sv-SE');
+const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+const RETURN_KEY = 'belvedere-tavern-return';
 
 export function createTavernTransition({pauseGate} = {}) {
   let frame, badge, curtain, entered = false, waiting = false, ready = false, failed = false;
-  let startedAt = 0, poll, cacheLimited = false;
+  let startedAt = 0, poll, cacheLimited = false, returning = false;
   const current = () => `${TODAY()}/${VERSION}`;
+  function visitedThisWeek() {
+    try {
+      const marker = JSON.parse(localStorage.getItem(RETURN_KEY));
+      if (marker?.version === VERSION && Date.now() - marker.at >= 0 && Date.now() - marker.at < WEEK_MS) return true;
+      return localStorage.getItem('belvedere-tavern-ready-day') === current();
+    } catch { return false; }
+  }
 
   function say(message) {
     if (!badge) return;
@@ -36,9 +45,9 @@ export function createTavernTransition({pauseGate} = {}) {
   async function registerCache() {
     if (!('serviceWorker' in navigator)) return;
     try {
-      const registration = await navigator.serviceWorker.register(new URL('arrival-sw.js', ROOT), {scope: ROOT.pathname});
+      const registration = await navigator.serviceWorker.register(new URL('arrival-sw.js?v=week-20261024', ROOT), {scope: ROOT.pathname});
       await navigator.serviceWorker.ready;
-      registration.active?.postMessage({type: 'KEEP_TODAY', day: TODAY()});
+      registration.active?.postMessage({type: 'KEEP_WEEK'});
       navigator.serviceWorker.addEventListener('message', event => {
         if (event.data?.type !== 'CACHE_LIMITED') return;
         cacheLimited = true;
@@ -71,15 +80,14 @@ export function createTavernTransition({pauseGate} = {}) {
   async function prepare() {
     if (frame) return;
     makeUI(); startedAt = Date.now();
-    try {
-      if (localStorage.getItem('belvedere-tavern-ready-day') === current()) {
-        waiting = true;
-        curtain.hidden = false;
-        curtain.style.display = 'grid';
-        curtain.querySelector('p').textContent = '正在从今天的缓存恢复二楼场景…';
-        badge.hidden = true;
-      }
-    } catch { /* Private storage is optional. */ }
+    returning = visitedThisWeek();
+    if (returning) {
+      waiting = true;
+      curtain.hidden = false;
+      curtain.style.display = 'grid';
+      curtain.querySelector('p').textContent = '正在从本周缓存恢复二楼场景…';
+      badge.hidden = true;
+    }
     await registerCache();
     frame.src = TAVERN.href;
     poll = setInterval(check, 350);
@@ -87,7 +95,7 @@ export function createTavernTransition({pauseGate} = {}) {
   function reveal() {
     if (!ready || entered) return;
     entered = true; waiting = false; clearInterval(poll);
-    try { localStorage.setItem('belvedere-tavern-ready-day', current()); } catch { /* Private storage is optional. */ }
+    try { localStorage.setItem(RETURN_KEY, JSON.stringify({at: Date.now(), version: VERSION})); } catch { /* Private storage is optional. */ }
     curtain.querySelector('p').textContent = '炉火已亮。';
     requestAnimationFrame(() => {
       frame.style.opacity = '1'; frame.style.pointerEvents = 'auto';
@@ -112,6 +120,6 @@ export function createTavernTransition({pauseGate} = {}) {
     frame.src = new URL(`tavern/?v=${VERSION}&retry=${Date.now()}`, ROOT).href;
     poll = setInterval(check, 350);
   }
-  return {prepare, enter, status: () => ({ready, entered, waiting, failed, cacheLimited, frame: !!frame})};
+  return {prepare, enter, status: () => ({ready, entered, waiting, returning, failed, cacheLimited, frame: !!frame})};
 }
 
