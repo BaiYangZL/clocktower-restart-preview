@@ -8,7 +8,7 @@ import {Dialog} from './dialog.js';
 import {Mascot} from './mascot.js';
 import {createFX} from './weather-fx.js';
 import {GateStory} from './gate-story.js';
-import {createTavernTransition} from './tavern-transition.js?v=return-week-fixed-20261024';
+import {createTavernTransition} from './tavern-transition.js?v=full-preload-20261024';
 const $=id=>document.getElementById(id);
 const query=new URLSearchParams(location.search);
 // Review aids only: ?at=秒 jumps the journey to that moment and holds it; ?seed= fixes the
@@ -71,6 +71,9 @@ function tickTimers(dt){for(let i=timers.length-1;i>=0;i--){timers[i].t-=dt;if(t
 // ---------- the gate story ----------
 const tavernTransition=createTavernTransition({pauseGate:()=>game?.loop.sleep()});
 window.__tavernEntry=tavernTransition;
+tavernTransition.prepare();
+
+
 const story=new GateStory({spots:SPOTS,maxDoor:MAX_DOOR,
  leafPoint:(...args)=>scene.gate.leafPoint(...args),
  onEnd:()=>tavernTransition.enter()
@@ -79,7 +82,7 @@ const guardState=()=>story.guardState;
 const night=()=>weather==='rain'?'雨夜':'夜风';
 let run=0;
 const invitation=new Invitation({
- onSubmit:code=>{story.go('pending','allow-empty');dialog.portrait.set('pending');return verify(code);},
+ onSubmit:async code=>{story.go('pending','allow-empty');dialog.portrait.set('pending');const result=await verify(code);if(result.kind!=='ok')return result;invitation.status('密语无误，正在备好二楼大厅…','busy');try{await tavernTransition.whenReady();return result;}catch{return {kind:'scene'};}},
  onResult:r=>answer(r,run)
 });
 $('letter-reopen').addEventListener('click',()=>{story.go('wait','allow-empty');dialog.portrait.set('wait');invitation.reopen();});
@@ -116,7 +119,7 @@ async function answer(r,id){
  }else{
   // the message did not get through: not a refusal, and he says so
   story.go('puzzle','allow-empty');
-  const c=await dialog.ask(`……城里没有回音。也许是${night()}耽搁了信使。`,'puzzle',[['again','再呈一次'],['letter','再看一眼邀请函']]);if(!alive())return;
+  const c=await dialog.ask(r.kind==='scene'?'酒馆还未准备好。请稍等，再呈一次密语。':`……城里没有回音。也许是${night()}耽搁了信使。`,'puzzle',[['again','再呈一次'],['letter','再看一眼邀请函']]);if(!alive())return;
   await dialog.hide();$('letter-reopen').hidden=true;await invitation.reopen();if(c==='again'&&alive())$('letter-form').requestSubmit();
  }
 }
@@ -164,7 +167,7 @@ class Arrival extends Phaser.Scene {
  install(){
   this.gate?.destroy();this.fx?.destroy();
   this.gate=createGate(this,{images:{...this.images,approach:this.approach},weather,quality});
-  this.gateWeather=weather;this.gateQuality=quality;this.makeFX();this.placeCamera(0,true);this.ready=true;state.ready=true;if(!state.error)notice();tavernTransition.prepare();tavernTransition.prepare();tavernTransition.prepare();tavernTransition.prepare();tavernTransition.prepare();tavernTransition.prepare();tavernTransition.prepare();tavernTransition.prepare();
+  this.gateWeather=weather;this.gateQuality=quality;this.makeFX();this.placeCamera(0,true);this.ready=true;state.ready=true;if(!state.error)notice();tavernTransition.cacheGate();
  }
  makeFX(){
   this.fx?.destroy();if(!this.gate)return;

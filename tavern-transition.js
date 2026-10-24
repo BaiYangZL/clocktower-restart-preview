@@ -7,7 +7,7 @@ const RETURN_KEY = 'belvedere-tavern-return';
 
 export function createTavernTransition({pauseGate} = {}) {
   let frame, badge, curtain, entered = false, waiting = false, ready = false, failed = false;
-  let startedAt = 0, poll, cacheLimited = false, returning = false;
+  let startedAt = 0, poll, cacheLimited = false, returning = false, cacheTask;
   const current = () => `${TODAY()}/${VERSION}`;
   function visitedThisWeek() {
     try {
@@ -46,18 +46,29 @@ export function createTavernTransition({pauseGate} = {}) {
     document.body.append(frame, badge, curtain);
     say('酒馆正在备好，请继续查看邀请函…');
   }
-  async function registerCache() {
-    if (!('serviceWorker' in navigator)) return;
-    try {
-      const registration = await navigator.serviceWorker.register(new URL('arrival-sw.js?v=week-20261024', ROOT), {scope: ROOT.pathname});
-      await navigator.serviceWorker.ready;
-      registration.active?.postMessage({type: 'KEEP_WEEK'});
-      navigator.serviceWorker.addEventListener('message', event => {
-        if (event.data?.type !== 'CACHE_LIMITED') return;
-        cacheLimited = true;
-        if (waiting) curtain.querySelector('p').textContent = '手机存储空间不足，已继续在线载入酒馆。';
-      });
-    } catch (error) { console.warn('酒馆缓存不可用，继续在线载入', error); }
+  function registerCache() {
+    if (cacheTask) return cacheTask;
+    cacheTask = (async () => {
+      if (!('serviceWorker' in navigator)) return;
+      try {
+        const registration = await navigator.serviceWorker.register(new URL('arrival-sw.js?v=full-preload-20261024', ROOT), {scope: ROOT.pathname});
+        await navigator.serviceWorker.ready;
+        registration.active?.postMessage({type: 'KEEP_WEEK'});
+        navigator.serviceWorker.addEventListener('message', event => {
+          if (event.data?.type !== 'CACHE_LIMITED') return;
+          cacheLimited = true;
+          if (waiting) curtain.querySelector('p').textContent = '手机存储空间不足，已继续在线载入酒馆。';
+        });
+        return registration;
+      } catch (error) { console.warn('酒馆缓存不可用，继续在线载入', error); }
+    })();
+    return cacheTask;
+  }
+  async function cacheGate() {
+    const registration = await registerCache();
+    if (!registration?.active) return;
+    const urls = performance.getEntriesByType('resource').map(entry => entry.name);
+    registration.active.postMessage({type: 'CACHE_GATE', urls});
   }
   function check() {
     if (!frame || entered) return;
@@ -126,6 +137,18 @@ export function createTavernTransition({pauseGate} = {}) {
     frame.src = new URL(`tavern/?v=${VERSION}&retry=${Date.now()}`, ROOT).href;
     poll = setInterval(check, 350);
   }
-  return {prepare, enter, status: () => ({ready, entered, waiting, returning, failed, cacheLimited, frame: !!frame})};
+  async function whenReady() {
+    if (!frame) await prepare();
+    if (failed) retry();
+    if (ready) return;
+    return new Promise((resolve, reject) => {
+      const watcher = setInterval(() => {
+        if (!ready && !failed) return;
+        clearInterval(watcher);
+        if (ready) resolve(); else reject(new Error('酒馆场景未能载入'));
+      }, 350);
+    });
+  }
+  return {prepare, cacheGate, whenReady, enter, status: () => ({ready, entered, waiting, returning, failed, cacheLimited, frame: !!frame, startedAt})};
 }
 
